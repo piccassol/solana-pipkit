@@ -1,7 +1,7 @@
 <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://cdn.vectorstock.com/i/1000v/79/42/solana-logo-coin-icon-isolated-vector-43697942.jpg">
     <source media="(prefers-color-scheme: light)" srcset="https://upload.wikimedia.org/wikipedia/commons/3/34/Solana_cryptocurrency_two.jpg">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/Solana_cryptocurrency_two.jpg" style="width: 40%; height: 40%;" alt="Solana logo">
+    <img src="[https://upload.wikimedia.org/wikipedia/commons/3/34/Solana_cryptocurrency_two.jp](https://imgs.search.brave.com/sZXOOoqvGeIvFDgPAfF2_lVUWTqMv49aGLRmYsL6vj8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9zb2xh/bmEuY29tL19uZXh0/L2ltYWdlP3VybD1o/dHRwczovL2Nkbi5i/dWlsZGVyLmlvL2Fw/aS92MS9pbWFnZS9h/c3NldHMlMkZjZTBj/NzMyM2E5N2E0ZDkx/YmQwYmFhNzQ5MGVj/OTEzOSUyRjA5OWQ2/MDcyMzNhMDQ3OWJi/NGY1MDMyMGExMmNk/YmZlJnc9MTA4MCZx/PTc1)g" style="width: 40%; height: 40%;" alt="Solana logo">
 </picture>
 
 
