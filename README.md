@@ -22,66 +22,6 @@
 <a href="https://twitter.com/ryzomeai"><img src="https://img.shields.io/twitter/follow/ryzomeai"></a> &nbsp
 
 
-
-Get Started
-Simple example
-
-Examples
-
-What is solana-pipkit?
-solana-pipkit is a Rust crate providing a collection of practical utilities for Solana program development. It simplifies common tasks like rent recovery, SPL token operations, PDA management, and reusable Anchor patterns.
-More details can be found in the API Reference.
-Features
-
-Rent Cleaner: Reclaim SOL from empty or closed accounts
-Token Utils: Helpers for burning tokens, transferring, and closing token accounts
-PDA Helpers: Easy PDA derivation, validation, and common finders (e.g., metadata PDA)
-Account Utils: Validation and common account operations
-Anchor Patterns: Reusable structures and macros for Anchor-based programs
-
-Get Started
-Add the crate to your Cargo.toml:
-toml[dependencies]
-solana-pipkit = { git = "https://github.com/piccassol/solana-pipkit" }
-(Once published to crates.io, use version instead of git.)
-Simple example
-Example: Recovering rent from empty accounts
-Rustuse solana_pipkit::rent::RentCleaner;
-use solana_sdk::{signer::Signer, signature::read_keypair_file};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let keypair = read_key_pair_file("~/.config/solana/id.json")?;
-    let rpc_url = "https://api.mainnet-beta.solana.com";
-
-    let cleaner = RentCleaner::new(rpc_url, keypair.pubkey(), keypair);
-
-    let reclaimed = cleaner.clean_empty_accounts().await?;
-    println!("Reclaimed {} lamports", reclaimed);
-
-    Ok(())
-}
-More examples are available in the examples/ directory:
-
-Rent cleaning
-Token burning and closing
-PDA derivation
-
-License
-This project is licensed under the MIT License.
-
-
-
-
-
-Built with Rust
-   
-Built on Solana
-
-
-Built by Noah Michél at ARK Technologies
-1 / 23sFastgreat ! update the shields their not loading
-<picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://cryptologos.cc/logos/solana-sol-logo.png?v=029">
     <source media="(prefers-color-scheme: light)" srcset="https://cryptologos.cc/logos/solana-sol-logo.png?v=029">
     <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=029" style="width: 40%; height: 40%;" alt="Solana logo">
