@@ -1,122 +1,100 @@
-# Solana Rust Toolkit
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.vectorstock.com/i/1000v/79/42/solana-logo-coin-icon-isolated-vector-43697942.jpg">
+    <source media="(prefers-color-scheme: light)" srcset="https://upload.wikimedia.org/wikipedia/commons/3/34/Solana_cryptocurrency_two.jpg">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/Solana_cryptocurrency_two.jpg" style="width: 40%; height: 40%;" alt="Solana logo">
+</picture>
 
-A collection of Rust utilities for Solana development — rent recovery, token operations, PDA helpers, and common program patterns.
 
-## Features
+https://img.shields.io/github/stars/piccassol/solana-pipkit?style=social
+ 
+https://img.shields.io/github/forks/piccassol/solana-pipkit?style=social
 
-- **Rent Cleaner** — Reclaim SOL from empty accounts
-- **Token Utils** — SPL token helpers (burn, transfer, close)
-- **PDA Helpers** — Simplified PDA derivation and validation
-- **Account Utils** — Common account operations and validation
-- **Anchor Patterns** — Reusable Anchor program structures
 
-## Installation
+https://img.shields.io/crates/v/solana-pipkit.svg?color=dea584
+ 
+https://img.shields.io/crates/d/solana-pipkit.svg?color=dea584
+ 
+https://img.shields.io/badge/docs-API%20Reference-dea584.svg
 
-Add to your `Cargo.toml`:
 
-```toml
-[dependencies]
-solana-rust-toolkit = { git = "https://github.com/piccassol/solana-rust-toolkit" }
-```
+https://img.shields.io/badge/built%20on-Solana-dea584.svg
+ 
+https://img.shields.io/badge/built%20with-Rust-dea584.svg?logo=rust
 
-Or for specific modules:
 
-```toml
-[dependencies]
-solana-sdk = "1.18"
-solana-client = "1.18"
-spl-token = "4.0"
-anchor-lang = "0.29"
-```
+https://img.shields.io/badge/built%20by-ARK%20Technologies-dea584
 
-## Quick Start
 
-### Rent Cleaner
+[📖 API Reference](https://docs.rs/solana-pipkit)
+  •  
+[🔗 Solana Docs](https://docs.solana.com)
+  •  
+[🤝 Contribute](https://github.com/piccassol/solana-pipkit/issues/new)
+  •  
+[✨ Examples](./examples)
 
-```rust
-use solana_rust_toolkit::rent_cleaner::RentCleaner;
+✨ If you find this toolkit helpful for your Solana development, please consider starring the repo!
+[!NOTE]
+This is an early-stage utility crate. Features may evolve, and breaking changes could occur as the toolkit matures.
+Table of contents
 
-let cleaner = RentCleaner::new(rpc_url, keypair);
-let recovered = cleaner.clean_empty_accounts().await?;
-println!("Recovered {} SOL", recovered);
-```
+Table of contents
+What is solana-pipkit?
+Features
+Get Started
+Simple example
 
-### Token Operations
+Examples
 
-```rust
-use solana_rust_toolkit::token_utils::{burn_tokens, close_token_account};
+What is solana-pipkit?
+solana-pipkit is a Rust crate providing a collection of practical utilities for Solana program development. It simplifies common tasks like rent recovery, SPL token operations, PDA management, and reusable Anchor patterns.
+More details can be found in the API Reference.
+Features
 
-// Burn tokens
-burn_tokens(&client, &payer, &mint, &token_account, amount).await?;
+Rent Cleaner: Reclaim SOL from empty or closed accounts
+Token Utils: Helpers for burning tokens, transferring, and closing token accounts
+PDA Helpers: Easy PDA derivation, validation, and common finders (e.g., metadata PDA)
+Account Utils: Validation and common account operations
+Anchor Patterns: Reusable structures and macros for Anchor-based programs
 
-// Close empty token account and reclaim rent
-close_token_account(&client, &payer, &token_account).await?;
-```
+Get Started
+Add the crate to your Cargo.toml:
+toml[dependencies]
+solana-pipkit = { git = "https://github.com/piccassol/solana-pipkit" }
+(Once published to crates.io, use version instead of git.)
+Simple example
+Example: Recovering rent from empty accounts
+Rustuse solana_pipkit::rent::RentCleaner;
+use solana_sdk::{signer::Signer, signature::read_keypair_file};
 
-### PDA Helpers
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let keypair = read_key_pair_file("~/.config/solana/id.json")?;
+    let rpc_url = "https://api.mainnet-beta.solana.com";
 
-```rust
-use solana_rust_toolkit::pda::{derive_pda, find_metadata_pda};
+    let cleaner = RentCleaner::new(rpc_url, keypair.pubkey(), keypair);
 
-// Derive custom PDA
-let (pda, bump) = derive_pda(&[b"vault", user.as_ref()], &program_id);
+    let reclaimed = cleaner.clean_empty_accounts().await?;
+    println!("Reclaimed {} lamports", reclaimed);
 
-// Find token metadata PDA
-let metadata_pda = find_metadata_pda(&mint);
-```
+    Ok(())
+}
+More examples are available in the examples/ directory:
 
-## Module Reference
+Rent cleaning
+Token burning and closing
+PDA derivation
 
-### `rent_cleaner`
-Scan and close rent-exempt accounts with zero balance.
+License
+This project is licensed under the MIT License.
 
-### `token_utils`
-SPL token operations: mint, burn, transfer, freeze, close accounts.
 
-### `pda`
-PDA derivation helpers for common Solana programs (Token, Metadata, Associated Token).
 
-### `account_utils`
-Account validation, data parsing, and common checks.
 
-### `programs`
-Anchor program templates and patterns.
 
-## Examples
+Built with Rust
+   
+Built on Solana
 
-See the `/examples` directory for complete working examples:
 
-```bash
-# Run rent cleaner
-cargo run --example rent_cleaner
-
-# Token burn example
-cargo run --example token_burn
-
-# PDA derivation
-cargo run --example pda_derive
-```
-
-## Development
-
-```bash
-# Build
-cargo build
-
-# Test
-cargo test
-
-# Format
-cargo fmt
-
-# Lint
-cargo clippy
-```
-
-## License
-
-MIT
-
----
-
-Built by [Noah Michél](https://github.com/piccassol) @ [ARK Technologies](https://arktechnologies.ai)
+Built by Noah Michél at ARK Technologies
