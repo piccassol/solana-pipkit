@@ -108,7 +108,6 @@ More examples are available in the examples/ directory.
 ⚠️ Note
 This is an early-stage utility crate. APIs may evolve, and breaking changes can occur as the toolkit matures.
 
-🦀 Solana × Rust
 <p align="center"> <picture> <source media="(prefers-color-scheme: dark)" srcset="https://imgs.search.brave.com/sZXOOoqvGeIvFDgPAfF2_lVUWTqMv49aGLRmYsL6vj8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9zb2xh/bmEuY29tL19uZXh0L2ltYWdlP3VybD1o"> <source media="(prefers-color-scheme: light)" srcset="https://imgs.search.brave.com/sZXOOoqvGeIvFDgPAfF2_lVUWTqMv49aGLRmYsL6vj8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9zb2xh/bmEuY29tL19uZXh0L2ltYWdlP3VybD1o"> <img src="https://imgs.search.brave.com/sZXOOoqvGeIvFDgPAfF2_lVUWTqMv49aGLRmYsL6vj8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9zb2xh/bmEuY29tL19uZXh0L2ltYWdlP3VybD1o" width="140" alt="Solana crab logo"> </picture> </p> <p align="center"> <strong>Fast chains deserve safe, expressive tooling.</strong><br/> <em>solana-pipkit</em> exists to remove boilerplate, reduce footguns, and let you focus on protocol logic. </p>
 ⚠️ Project Status
 
