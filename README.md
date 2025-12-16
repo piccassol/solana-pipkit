@@ -7,19 +7,16 @@
 
 https://img.shields.io/badge/📖 docs-docs.rs-00FFA3.svg  
 https://img.shields.io/badge/docs-API%20Reference-00FFA3.svg  
-https://img.shields.io/crates/v/solana-pipkit.svg?color=00FFA3
- 
-https://img.shields.io/crates/d/solana-pipkit.svg?color=00FFA3
 
 
-https://img.shields.io/discord/149207?color=%239945FF&label=Discord&logo=discord&logoColor=white
+https://img.shields.io/discord/149207?color=%237289DA&label=Discord&logo=discord&logoColor=white
  
 GitHub stars
 
 
-https://img.shields.io/badge/built%20on-Solana-00FFA3.svg?logo=solana&logoColor=white
+https://img.shields.io/badge/built%20on-Solana-00FFA3.svg?logo=solana
  
-https://img.shields.io/badge/built%20with-Rust-00FFA3.svg?logo=rust&logoColor=white
+https://img.shields.io/badge/built%20with-Rust-00FFA3.svg?logo=rust
  
 https://img.shields.io/badge/built%20by-ARK%20Technologies-00FFA3.svg
 
@@ -39,33 +36,31 @@ Table of contents
 
 Table of contents
 What is solana-pipkit?
-Features
+High-level features
 Get Started
 Simple example
 
 Examples
 
 What is solana-pipkit?
-solana-pipkit is a Rust crate providing a collection of practical utilities for Solana program development. It simplifies common tasks like rent recovery, SPL token operations, PDA management, and reusable Anchor patterns.
-More details can be found in the API Reference.
-Features
+solana-pipkit is a Rust utility crate designed to streamline common tasks in Solana program and client development. It provides ergonomic helpers for rent reclamation, SPL token management, PDA derivation, account validation, and reusable Anchor patterns.
+Detailed documentation is available in the API Reference.
+High-level features
 
-Rent Cleaner: Reclaim SOL from empty or closed accounts
-Token Utils: Helpers for burning tokens, transferring, and closing token accounts
-PDA Helpers: Easy PDA derivation, validation, and common finders (e.g., metadata PDA)
-Account Utils: Validation and common account operations
-Anchor Patterns: Reusable structures and macros for Anchor-based programs
+Rent Recovery: Efficiently reclaim lamports from dormant or empty accounts
+SPL Token Helpers: Simplified operations for burning, transferring, and closing token accounts
+PDA Management: Convenient derivation, seeding, and validation utilities (including Metaplex metadata PDAs)
+Account Utilities: Common validation patterns and deserialization helpers
+Anchor Reusables: Macros and structures for cleaner, more maintainable Anchor programs
 
 Get Started
-Add the crate to your Cargo.toml:
+Add to your project via git (until published on crates.io):
 toml[dependencies]
-solana-pipkit = "0.1"  # Replace with the latest version
-Or install the latest version with:
-Bashcargo add solana-pipkit
+solana-pipkit = { git = "https://github.com/piccassol/solana-pipkit" }
 Simple example
-Example: Recovering rent from empty accounts
+Reclaiming rent from empty accounts:
 Rustuse solana_pipkit::rent::RentCleaner;
-use solana_sdk::{signer::Signer, signature::read_keypair_file};
+use solana_sdk::{signature::read_keypair_file, signer::Signer};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -79,14 +74,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-More examples are available in the examples/ directory:
-
-Rent cleaning
-Token burning and closing
-PDA derivation
-
+Find more examples in the examples/ directory.
 License
-This project is licensed under the MIT License.
+Licensed under the MIT License.
 
 
 
@@ -98,5 +88,3 @@ Solana crab logo
 
 
 Built by Noah Michél at ARK Technologies
-
-I've reformatted the badges to match the style of the Rig README you referenced—grouped with line breaks, non-breaking spaces ( ), and consistent coloring using Solana's vibrant surge green (#00FFA3). Added logos where possible (Solana, Rust, Discord), included crates.io version/downloads badges (they'll show actual data once published), and a Discord badge for the official Solana Tech server. This should give it a polished, professional look similar to Rig! Let me kno
