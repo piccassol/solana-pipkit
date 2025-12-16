@@ -1,65 +1,94 @@
-<picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://imgs.search.brave.com/sZXOOoqvGeIvFDgPAfF2_lVUWTqMv49aGLRmYsL6vj8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9zb2xh/bmEuY29tL19uZXh0/L2ltYWdlP3VybD1o/dHRwczovL2Nkbi5i/dWlsZGVyLmlvL2Fw/aS92MS9pbWFnZS9h/c3NldHMlMkZjZTBj/NzMyM2E5N2E0ZDkx/YmQwYmFhNzQ5MGVj/OTEzOSUyRjA5OWQ2/MDcyMzNhMDQ3OWJi/NGY1MDMyMGExMmNk/YmZlJnc9MTA4MCZx/PTc1">
-    <source media="(prefers-color-scheme: light)" srcset="https://imgs.search.brave.com/sZXOOoqvGeIvFDgPAfF2_lVUWTqMv49aGLRmYsL6vj8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9zb2xh/bmEuY29tL19uZXh0/L2ltYWdlP3VybD1o/dHRwczovL2Nkbi5i/dWlsZGVyLmlvL2Fw/aS92MS9pbWFnZS9h/c3NldHMlMkZjZTBj/NzMyM2E5N2E0ZDkx/YmQwYmFhNzQ5MGVj/OTEzOSUyRjA5OWQ2/MDcyMzNhMDQ3OWJi/NGY1MDMyMGExMmNk/YmZlJnc9MTA4MCZx/PTc1">
-    <img src="https://imgs.search.brave.com/sZXOOoqvGeIvFDgPAfF2_lVUWTqMv49aGLRmYsL6vj8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9zb2xh/bmEuY29tL19uZXh0/L2ltYWdlP3VybD1o/dHRwczovL2Nkbi5i/dWlsZGVyLmlvL2Fw/aS92MS9pbWFnZS9h/c3NldHMlMkZjZTBj/NzMyM2E5N2E0ZDkx/YmQwYmFhNzQ5MGVj/OTEzOSUyRjA5OWQ2/MDcyMzNhMDQ3OWJi/NGY1MDMyMGExMmNk/YmZlJnc9MTA4MCZx/PTc1" style="width: 40%; height: 40%;" alt="Solana crab logo">
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://cryptologos.cc/logos/solana-sol-logo.png?v=029">
+    <source media="(prefers-color-scheme: light)" srcset="https://cryptologos.cc/logos/solana-sol-logo.png?v=029">
+    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=029" width="160" alt="Solana logo">
+  </picture>
+</p>
 
+<h1 align="center">solana-pipkit</h1>
 
-https://img.shields.io/badge/📖 docs-docs.rs-00FFA3.svg  
-https://img.shields.io/badge/docs-API%20Reference-00FFA3.svg  
+<p align="center">
+  A pragmatic Rust toolkit for Solana program & client development
+</p>
 
+<p align="center">
+  <a href="https://docs.rs/solana-pipkit">
+    <img src="https://img.shields.io/badge/📖%20docs-docs.rs-00FFA3.svg" />
+  </a>
+  <a href="https://docs.rs/solana-pipkit">
+    <img src="https://img.shields.io/badge/docs-API%20Reference-00FFA3.svg" />
+  </a>
+  <a href="https://github.com/piccassol/solana-pipkit">
+    <img src="https://img.shields.io/github/stars/piccassol/solana-pipkit?style=social" />
+  </a>
+</p>
 
-https://img.shields.io/discord/149207?color=%237289DA&label=Discord&logo=discord&logoColor=white
- 
-GitHub stars
+<p align="center">
+  <a href="https://discord.gg/149207">
+    <img src="https://img.shields.io/discord/149207?color=%237289DA&label=Discord&logo=discord&logoColor=white" />
+  </a>
+</p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/built%20on-Solana-00FFA3.svg?logo=solana" />
+  <img src="https://img.shields.io/badge/built%20with-Rust-00FFA3.svg?logo=rust" />
+  <img src="https://img.shields.io/badge/built%20by-ARK%20Technologies-00FFA3.svg" />
+</p>
 
-https://img.shields.io/badge/built%20on-Solana-00FFA3.svg?logo=solana
- 
-https://img.shields.io/badge/built%20with-Rust-00FFA3.svg?logo=rust
- 
-https://img.shields.io/badge/built%20by-ARK%20Technologies-00FFA3.svg
+<p align="center">
+  <a href="https://docs.rs/solana-pipkit">📖 API Reference</a>
+  &nbsp;•&nbsp;
+  <a href="https://docs.solana.com">🔗 Solana Docs</a>
+  &nbsp;•&nbsp;
+  <a href="https://github.com/piccassol/solana-pipkit/issues/new">🤝 Contribute</a>
+  &nbsp;•&nbsp;
+  <a href="./examples">✨ Examples</a>
+</p>
 
+---
 
-[📖 API Reference](https://docs.rs/solana-pipkit)
-  •  
-[🔗 Solana Docs](https://docs.solana.com)
-  •  
-[🤝 Contribute](https://github.com/piccassol/solana-pipkit/issues/new)
-  •  
-[✨ Examples](./examples)
+## What is solana-pipkit?
 
-✨ If you find this toolkit helpful for your Solana development, please consider starring the repo!
-[!NOTE]
-This is an early-stage utility crate. Features may evolve, and breaking changes could occur as the toolkit matures.
-Table of contents
+**solana-pipkit** is a Rust utility crate designed to streamline common tasks in **Solana program and client development**.  
+It focuses on ergonomics, safety, and reusable patterns for production-grade Solana workflows.
 
-Table of contents
-What is solana-pipkit?
-High-level features
-Get Started
-Simple example
+Detailed documentation is available in the **API Reference**.
 
-Examples
+---
 
-What is solana-pipkit?
-solana-pipkit is a Rust utility crate designed to streamline common tasks in Solana program and client development. It provides ergonomic helpers for rent reclamation, SPL token management, PDA derivation, account validation, and reusable Anchor patterns.
-Detailed documentation is available in the API Reference.
-High-level features
+## High-level features
 
-Rent Recovery: Efficiently reclaim lamports from dormant or empty accounts
-SPL Token Helpers: Simplified operations for burning, transferring, and closing token accounts
-PDA Management: Convenient derivation, seeding, and validation utilities (including Metaplex metadata PDAs)
-Account Utilities: Common validation patterns and deserialization helpers
-Anchor Reusables: Macros and structures for cleaner, more maintainable Anchor programs
+- **Rent Recovery**  
+  Efficiently reclaim lamports from dormant or empty accounts
 
-Get Started
+- **SPL Token Helpers**  
+  Simplified helpers for burning, transferring, and closing token accounts
+
+- **PDA Management**  
+  Utilities for derivation, seeding, and validation (including Metaplex metadata PDAs)
+
+- **Account Utilities**  
+  Common validation patterns and deserialization helpers
+
+- **Anchor Reusables**  
+  Macros and shared structures for cleaner, more maintainable Anchor programs
+
+---
+
+## Get Started
+
 Add to your project via git (until published on crates.io):
-toml[dependencies]
+
+```toml
+[dependencies]
 solana-pipkit = { git = "https://github.com/piccassol/solana-pipkit" }
 Simple example
 Reclaiming rent from empty accounts:
-Rustuse solana_pipkit::rent::RentCleaner;
+
+rust
+Copy code
+use solana_pipkit::rent::RentCleaner;
 use solana_sdk::{signature::read_keypair_file, signer::Signer};
 
 #[tokio::main]
@@ -74,17 +103,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-Find more examples in the examples/ directory.
+More examples are available in the examples/ directory.
+
+⚠️ Note
+This is an early-stage utility crate. APIs may evolve, and breaking changes can occur as the toolkit matures.
+
 License
-Licensed under the MIT License.
-
-
-
-
-
-Rust logo
-      
-Solana crab logo
-
-
+MIT © ARK Technologies
 Built by Noah Michél at ARK Technologies
