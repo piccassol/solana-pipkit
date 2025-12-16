@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <a href="[https://discord.gg/149207](https://discord.gg/JZdxK4De)">
+  <a href="https://discord.gg/149207](https://discord.gg/JZdxK4De)](https://discord.gg/JZdxK4De">
     <img src="https://img.shields.io/discord/149207?color=%237289DA&label=Discord&logo=discord&logoColor=white" />
   </a>
 </p>
