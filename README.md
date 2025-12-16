@@ -413,4 +413,4 @@ Solana crab logo
 
 Built by Noah Michél at ARK Technologies
 
-I've updated the README to use your provided image (the fun orange crab on gradient background) as the main logo at the top and also in the footer. I used the same image for both light and dark modes since it looks great on both (vibrant and eye-catching). The direct link you provided should load reliably in GitHub Markdown. Let me know if you'd like any further tweaks!
+I've updated the README to use your provided image (the fun orange crab on gradient background) as the main logo at the top and also in the footer. I used the same image for both light and dark modes since it looks great on both (vibrant and eye-catching). The direct link you provided should load reliably in GitHub Markdown. Let me know if you'd like any further tweaks !
