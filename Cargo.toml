@@ -1,0 +1,59 @@
+[package]
+name = "solana-rust-toolkit"
+version = "0.1.0"
+edition = "2021"
+authors = ["Noah Michél <noah@arktechnologies.ai>"]
+description = "Rust utilities for Solana development"
+license = "MIT"
+repository = "https://github.com/piccassol/solana-rust-toolkit"
+keywords = ["solana", "blockchain", "rust", "web3", "crypto"]
+categories = ["cryptography::cryptocurrencies"]
+
+[lib]
+path = "src/lib.rs"
+
+[[example]]
+name = "rent_cleaner"
+path = "examples/rent_cleaner.rs"
+
+[[example]]
+name = "token_burn"
+path = "examples/token_burn.rs"
+
+[dependencies]
+# Solana
+solana-sdk = "1.18"
+solana-client = "1.18"
+solana-account-decoder = "1.18"
+solana-transaction-status = "1.18"
+
+# SPL
+spl-token = "4.0"
+spl-associated-token-account = "2.3"
+
+# Anchor (optional)
+anchor-lang = { version = "0.29", optional = true }
+anchor-spl = { version = "0.29", optional = true }
+
+# Metaplex
+mpl-token-metadata = "4.1"
+
+# Async
+tokio = { version = "1.36", features = ["full"] }
+
+# Serialization
+borsh = "1.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Utils
+thiserror = "1.0"
+anyhow = "1.0"
+bs58 = "0.5"
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[features]
+default = []
+anchor = ["anchor-lang", "anchor-spl"]
