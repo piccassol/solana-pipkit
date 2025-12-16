@@ -22,57 +22,6 @@
 <a href="https://twitter.com/ryzomeai"><img src="https://img.shields.io/twitter/follow/ryzomeai"></a> &nbsp
 
 
-<p align="center">
-<br>
-<br>
-<img src="img/built-by-playgrounds.svg" alt="Build by Playgrounds" width="30%">
-</p>
-<picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.vectorstock.com/i/1000v/79/42/solana-logo-coin-icon-isolated-vector-43697942.jpg">
-    <source media="(prefers-color-scheme: light)" srcset="https://upload.wikimedia.org/wikipedia/commons/3/34/Solana_cryptocurrency_two.jpg">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/Solana_cryptocurrency_two.jpg" style="width: 40%; height: 40%;" alt="Solana logo">
-</picture>
-
-
-https://img.shields.io/github/stars/piccassol/solana-pipkit?style=social
- 
-https://img.shields.io/github/forks/piccassol/solana-pipkit?style=social
-
-
-https://img.shields.io/crates/v/solana-pipkit.svg?color=dea584
- 
-https://img.shields.io/crates/d/solana-pipkit.svg?color=dea584
- 
-https://img.shields.io/badge/docs-API%20Reference-dea584.svg
-
-
-https://img.shields.io/badge/built%20on-Solana-dea584.svg
- 
-https://img.shields.io/badge/built%20with-Rust-dea584.svg?logo=rust
-
-
-https://img.shields.io/badge/built%20by-ARK%20Technologies-dea584
-
-
-[📖 API Reference](https://docs.rs/solana-pipkit)
-  •  
-[🔗 Solana Docs](https://docs.solana.com)
-  •  
-[🤝 Contribute](https://github.com/piccassol/solana-pipkit/issues/new)
-  •  
-[✨ Examples](./examples)
-
-
-Examples
-
-What is solana-pipkit?
-solana-pipkit is a Rust crate providing a collection of practical utilities for Solana program development. It simplifies common tasks like rent recovery, SPL token operations, PDA management, and reusable Anchor patterns.
-More details can be found in the API Reference.
-Features
-
-
-
-
   
 <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://cryptologos.cc/logos/solana-sol-logo.png?v=029">
