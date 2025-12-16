@@ -1,4 +1,4 @@
-//! Error types for the toolkit.
+//! Error types for solana-pipkit.
 
 use thiserror::Error;
 
@@ -16,7 +16,10 @@ pub enum ToolkitError {
     #[error("Invalid account data: {0}")]
     InvalidAccountData(String),
 
-    #[error("Insufficient balance: need {needed} lamports, have {available}")]
+    #[error("Deserialization error: {0}")]
+    Deserialization(String),
+
+    #[error("Insufficient balance: need {needed}, have {available}")]
     InsufficientBalance { needed: u64, available: u64 },
 
     #[error("Invalid PDA: {0}")]
@@ -28,21 +31,8 @@ pub enum ToolkitError {
     #[error("Signature error: {0}")]
     SignatureError(#[from] solana_sdk::signature::SignerError),
 
-    #[error("Borsh serialization error: {0}")]
-    BorshError(#[from] std::io::Error),
-
     #[error("Custom error: {0}")]
     Custom(String),
 }
 
-impl From<&str> for ToolkitError {
-    fn from(s: &str) -> Self {
-        ToolkitError::Custom(s.to_string())
-    }
-}
-
-impl From<String> for ToolkitError {
-    fn from(s: String) -> Self {
-        ToolkitError::Custom(s)
-    }
-}
+pub type Result<T> = std::result::Result<T, ToolkitError>;
