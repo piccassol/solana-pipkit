@@ -16,7 +16,7 @@
   <a href="https://docs.rs/solana-pipkit">
     <img src="https://img.shields.io/badge/📖%20docs-docs.rs-00FFA3.svg" />
   </a>
-  <a href="https://docs.rs/solana-pipkit">
+  <a href="https://www.notion.so/solana-pipkit-Doc-001-2cb9a71542d480128dabe02e7d58026b?source=copy_link">
     <img src="https://img.shields.io/badge/docs-API%20Reference-00FFA3.svg" />
   </a>
   <a href="https://github.com/piccassol/solana-pipkit">
