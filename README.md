@@ -1,3 +1,13 @@
+
+
+
+  
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://cryptologos.cc/logos/solana-sol-logo.png?v=029">
+    <source media="(prefers-color-scheme: light)" srcset="https://cryptologos.cc/logos/solana-sol-logo.png?v=029">
+    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=029" style="width: 40%; height: 40%;" alt="Solana logo">
+</picture>
+
 <p align="center">
 <picture>
     <source media="(prefers-color-scheme: dark)" srcset="img/rig-playgrounds-dark.svg">
@@ -20,28 +30,6 @@
 <a href=""><img src="https://img.shields.io/badge/built_with-Rust-dca282.svg?logo=rust" /></a>
  
 <a href="https://twitter.com/ryzomeai"><img src="https://img.shields.io/twitter/follow/ryzomeai"></a> &nbsp
-
-
-  
-<picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cryptologos.cc/logos/solana-sol-logo.png?v=029">
-    <source media="(prefers-color-scheme: light)" srcset="https://cryptologos.cc/logos/solana-sol-logo.png?v=029">
-    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=029" style="width: 40%; height: 40%;" alt="Solana logo">
-</picture>
-
-
-GitHub stars
- 
-GitHub forks
-
-
-docs.rs
-
-
-Built on Solana
- 
-Built with Rust
-
 
 Built by ARK Technologies
 
