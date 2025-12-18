@@ -1,5 +1,4 @@
-//! Error types for solana-pipkit.
-
+﻿//! Error types for solana-pipkit.
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -30,6 +29,18 @@ pub enum ToolkitError {
 
     #[error("Signature error: {0}")]
     SignatureError(#[from] solana_sdk::signature::SignerError),
+
+    #[error("Network error: {0}")]
+    NetworkError(String),
+
+    #[error("Parse error: {0}")]
+    ParseError(String),
+
+    #[error("Jupiter error: {0}")]
+    JupiterError(String),
+
+    #[error("Signing error: {0}")]
+    SigningError(String),
 
     #[error("Custom error: {0}")]
     Custom(String),

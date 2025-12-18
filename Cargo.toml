@@ -1,8 +1,8 @@
-[package]
+﻿[package]
 name = "solana-pipkit"
 version = "0.1.0"
 edition = "2021"
-authors = ["Noah Michél <noah@arktechnologies.ai>"]
+authors = ["Noah Michel <noah@arktechnologies.ai>"]
 description = "Pragmatic Rust utilities for Solana development"
 license = "MIT"
 repository = "https://github.com/piccassol/solana-pipkit"
@@ -20,29 +20,34 @@ path = "examples/rent_cleaner.rs"
 name = "token_burn"
 path = "examples/token_burn.rs"
 
+[[example]]
+name = "jupiter_swap"
+path = "examples/jupiter_swap.rs"
+required-features = ["jupiter"]
+
 [dependencies]
 solana-sdk = "1.18"
 solana-client = "1.18"
 solana-account-decoder = "1.18"
 solana-transaction-status = "1.18"
-
 spl-token = "4.0"
 spl-associated-token-account = "2.3"
-
 anchor-lang = { version = "0.29", optional = true }
 anchor-spl = { version = "0.29", optional = true }
-
 mpl-token-metadata = "4.1"
-
 tokio = { version = "1.36", features = ["full"] }
-
 borsh = "1.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-
 thiserror = "1.0"
 anyhow = "1.0"
 bs58 = "0.5"
+
+# Jupiter integration dependencies
+reqwest = { version = "0.11", features = ["json"], optional = true }
+base64 = { version = "0.21", optional = true }
+bincode = { version = "1.3", optional = true }
+lazy_static = { version = "1.4", optional = true }
 
 [dev-dependencies]
 tokio-test = "0.4"
@@ -50,3 +55,5 @@ tokio-test = "0.4"
 [features]
 default = []
 anchor = ["anchor-lang", "anchor-spl"]
+jupiter = ["reqwest", "base64", "bincode", "lazy_static"]
+all = ["anchor", "jupiter"]
