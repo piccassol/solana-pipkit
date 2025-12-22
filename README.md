@@ -145,7 +145,7 @@ This project is licensed under the MIT License.
 
 <p align="center">
   Built by <strong>Noah Michel</strong><br/>
-  © ARK Technologies
+  © Ark Technologies AI
 </p>
 
 <p align="center">
