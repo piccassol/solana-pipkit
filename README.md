@@ -16,8 +16,8 @@
   <a href="https://crates.io/crates/solana-pipkit">
     <img src="https://img.shields.io/crates/v/solana-pipkit.svg?style=flat&color=00FFA3" alt="Crates.io" />
   </a>
-  <a href="https://docs.rs/solana-pipkit">
-    <img src="https://img.shields.io/docsrs/solana-pipkit?color=00FFA3" alt="docs.rs" />
+  <a href="https://www.notion.so/Solana-pipkit-Doc-001-2cb9a71542d480128dabe02e7d58026b">
+    <img src="https://img.shields.io/badge/docs-Notion-00FFA3.svg" alt="Documentation" />
   </a>
   <a href="https://github.com/piccassol/solana-pipkit">
     <img src="https://img.shields.io/github/stars/piccassol/solana-pipkit?style=social" />
@@ -33,7 +33,7 @@
 <p align="center">
   <a href="https://crates.io/crates/solana-pipkit">Crates.io</a>
   &nbsp;•&nbsp;
-  <a href="https://docs.rs/solana-pipkit">API Reference</a>
+  <a href="https://www.notion.so/Solana-pipkit-Doc-001-2cb9a71542d480128dabe02e7d58026b">Documentation</a>
   &nbsp;•&nbsp;
   <a href="https://docs.solana.com">Solana Docs</a>
   &nbsp;•&nbsp;
