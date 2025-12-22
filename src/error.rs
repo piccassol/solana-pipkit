@@ -2,6 +2,7 @@
 //!
 //! This module provides a comprehensive error type for all toolkit operations.
 
+use spl_token::solana_program::program_error::ProgramError;
 use thiserror::Error;
 
 /// Main error type for solana-pipkit operations.
@@ -43,6 +44,10 @@ pub enum ToolkitError {
     /// SPL Token program error.
     #[error("Token error: {0}")]
     TokenError(String),
+
+    /// Solana program error.
+    #[error("Program error: {0}")]
+    ProgramError(#[from] ProgramError),
 
     /// Signature or signing error.
     #[error("Signature error: {0}")]

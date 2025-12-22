@@ -213,7 +213,7 @@ impl TransactionBuilder {
     }
 
     /// Build a transaction ready for signing.
-    pub fn build(self, payer: &Pubkey, recent_blockhash: Hash) -> Transaction {
+    pub fn build(self, payer: &Pubkey, _recent_blockhash: Hash) -> Transaction {
         let instructions = self.build_instructions();
         let message = Message::new(&instructions, Some(payer));
         Transaction::new_unsigned(message)

@@ -11,7 +11,6 @@ use solana_sdk::{
     message::Message,
     pubkey::Pubkey,
     signature::{Keypair, Signature, Signer},
-    system_instruction,
     transaction::Transaction,
 };
 use spl_token::instruction as token_instruction;

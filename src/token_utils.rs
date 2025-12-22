@@ -13,6 +13,7 @@ use solana_sdk::{
 };
 use spl_token::{
     instruction as token_instruction,
+    solana_program::program_pack::Pack,
     state::{Account as TokenAccount, Mint},
 };
 
@@ -94,7 +95,7 @@ impl TokenClient {
     /// Transfer tokens between accounts.
     pub async fn transfer(
         &self,
-        mint: &Pubkey,
+        _mint: &Pubkey,
         source: &Pubkey,
         destination: &Pubkey,
         amount: u64,
