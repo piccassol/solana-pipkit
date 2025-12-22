@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(cargo check:*)",
+      "Bash(/c/Users/noahm/.cargo/bin/cargo check)",
+      "Bash(C:/Users/noahm/.cargo/bin/cargo.exe check)",
+      "Bash(cmd.exe /c \"cargo check\")",
+      "Bash(powershell.exe -Command \"cd C:\\\\Users\\\\noahm\\\\solana-pipkit; cargo check\":*)",
+      "Bash(powershell.exe -Command \"cd C:\\\\Users\\\\noahm\\\\solana-pipkit; & ''C:\\\\Users\\\\noahm\\\\.cargo\\\\bin\\\\cargo.exe'' check\")",
+      "Bash(powershell.exe:*)"
+    ]
+  }
+}
