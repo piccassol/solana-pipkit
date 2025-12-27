@@ -1,6 +1,6 @@
 [package]
 name = "solana-pipkit"
-version = "0.2.1"
+version = "1.0.0"
 edition = "2021"
 rust-version = "1.75"
 authors = ["Noah Michel <noah@arktechnologies.ai>"]
@@ -36,6 +36,14 @@ path = "examples/transaction_batch.rs"
 [[example]]
 name = "account_graph"
 path = "examples/account_graph.rs"
+
+[[example]]
+name = "address_verification"
+path = "examples/address_verification.rs"
+
+[[example]]
+name = "full_safety_demo"
+path = "examples/full_safety_demo.rs"
 
 [dependencies]
 # Solana core

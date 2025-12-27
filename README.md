@@ -83,6 +83,52 @@ solana-pipkit = "0.2.1"
 - **Anchor Reusables**
   Macros and shared structures for cleaner, more maintainable Anchor programs
 
+- **Safety Protocol**
+  Client-side validation to prevent costly transaction mistakes
+
+---
+
+## Safety Features
+
+Crypto losses from typos and decimal errors are preventable. The safety module catches mistakes before they hit the chain.
+
+```rust
+use solana_pipkit::prelude::*;
+
+let protocol = SafetyProtocol::new()
+    .token_price(100.0)  // $100/SOL for USD calculations
+    .large_amount_threshold(1000.0);
+
+let report = protocol.validate_offline(
+    &sender,
+    &recipient,
+    amount_lamports,
+    9,  // SOL decimals
+    balance,
+);
+
+if !report.approved {
+    println!("Blocked: {:?}", report.blockers);
+    return Err("Transaction failed safety check");
+}
+
+if report.requires_confirmation {
+    println!("Warnings: {:?}", report.warnings);
+    // Prompt user to confirm
+}
+```
+
+**What it prevents:**
+- Address typos (invalid base58, wrong length)
+- Sending to yourself accidentally
+- Draining entire balance (>90% warning)
+- Decimal/magnitude errors (1000 vs 1.000)
+- Large transfers without confirmation (>$1000 USD)
+
+**Risk levels:** `Low` | `Medium` | `High` | `Critical`
+
+See [`examples/full_safety_demo.rs`](./examples/full_safety_demo.rs) for complete usage.
+
 ---
 
 ## Quick Example

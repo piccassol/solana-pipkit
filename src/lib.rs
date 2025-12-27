@@ -12,6 +12,7 @@
 //! - **Account Graph**: Traverse and analyze account relationships
 //! - **Anchor Helpers**: CPI builders, discriminators, and validation (optional)
 //! - **Jupiter Integration**: DEX aggregator for token swaps (optional)
+//! - **Safety Protocol**: Client-side safety checks to prevent common mistakes
 //!
 //! ## Feature Flags
 //!
@@ -35,6 +36,12 @@
 //!     .add_instruction(transfer_ix)
 //!     .compute_units(200_000)
 //!     .priority_fee(1000);
+//!
+//! // Verify address before sending
+//! let recipient = AddressVerifier::verify_address("7xKX...8AsU")?;
+//!
+//! // Validate amount
+//! let validation = AmountValidator::validate_amount(amount, 9, balance);
 //! ```
 
 pub mod account_graph;
@@ -43,6 +50,7 @@ pub mod anchor_helpers;
 pub mod error;
 pub mod pda;
 pub mod rent_cleaner;
+pub mod safety;
 pub mod token_utils;
 pub mod transaction;
 
@@ -86,6 +94,14 @@ pub mod prelude {
     pub use crate::anchor_helpers::{
         account_discriminator, instruction_discriminator, programs, CpiInstructionBuilder,
         RemainingAccountsBuilder,
+    };
+
+    // Safety protocol
+    pub use crate::safety::{
+        AddressComparison, AddressVerification, AddressVerifier,
+        AmountValidation, AmountValidator, AmountWarning, MagnitudeCheck,
+        RiskLevel, SafetyProtocol, SafetyReport, WarningSeverity,
+        LAMPORTS_PER_SOL,
     };
 
     #[cfg(feature = "jupiter")]

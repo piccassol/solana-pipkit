@@ -95,6 +95,22 @@ pub enum ToolkitError {
     /// Custom error with message.
     #[error("Custom error: {0}")]
     Custom(String),
+
+    /// Invalid address format or validation failure.
+    #[error("Invalid address '{address}': {reason}")]
+    InvalidAddress {
+        /// The invalid address string.
+        address: String,
+        /// Reason for validation failure.
+        reason: String,
+    },
+
+    /// Amount validation error.
+    #[error("Amount validation error: {message}")]
+    AmountValidation {
+        /// Error message.
+        message: String,
+    },
 }
 
 impl ToolkitError {
