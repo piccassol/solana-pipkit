@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2024-12-27
+
+### Fixed
+
+- docs: Fix README installation instructions
+
+## [1.0.0] - 2024-12-27
+
+### Added
+
+- **Client-Side Safety Protocol** (`safety` module)
+  - `AddressVerifier` for address validation and typo detection
+  - `AmountValidator` for decimal conversion and magnitude error detection
+  - `SafetyProtocol` orchestrator for unified transfer validation
+  - `SafetyReport` with risk levels (Low, Medium, High, Critical)
+  - Full balance warning (>90% of balance)
+  - Large amount confirmation (>$1000 USD threshold)
+  - Strict mode for zero-tolerance validation
+
+- **New Examples**
+  - `address_verification.rs` - Address validation demo
+  - `full_safety_demo.rs` - Complete safety protocol walkthrough
+
+### Changed
+
+- Updated to v1.0.0 stable release
+- Added safety types to prelude exports
+
 ## [0.2.0] - 2024-12-21
 
 ### Added
