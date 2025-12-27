@@ -61,7 +61,7 @@ Or add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-solana-pipkit = "0.2.1"
+solana-pipkit = "1.0.0"
 ```
 
 ---
