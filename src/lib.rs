@@ -13,6 +13,10 @@
 //! - **Anchor Helpers**: CPI builders, discriminators, and validation (optional)
 //! - **Jupiter Integration**: DEX aggregator for token swaps (optional)
 //! - **Safety Protocol**: Client-side safety checks to prevent common mistakes
+//! - **Transaction Simulation**: Preview transaction outcomes before execution
+//! - **Program Safety**: Analyze programs for safety before interaction
+//! - **MEV Protection**: Jito bundles and sandwich attack protection
+//! - **NFT Safety**: Verify NFT authenticity and detect counterfeits
 //!
 //! ## Feature Flags
 //!
@@ -48,9 +52,13 @@ pub mod account_graph;
 pub mod account_utils;
 pub mod anchor_helpers;
 pub mod error;
+pub mod mev_protection;
+pub mod nft_safety;
 pub mod pda;
+pub mod program_safety;
 pub mod rent_cleaner;
 pub mod safety;
+pub mod simulation;
 pub mod token_utils;
 pub mod transaction;
 
@@ -103,6 +111,31 @@ pub mod prelude {
         RiskLevel, SafetyProtocol, SafetyReport, WarningSeverity,
         HolderDistribution, RiskIndicator, TokenRiskLevel, TokenSafetyChecker,
         TokenSafetyReport, LAMPORTS_PER_SOL,
+        ComprehensiveSafetyAnalyzer, ComprehensiveSafetyReport,
+    };
+
+    // Transaction simulation
+    pub use crate::simulation::{
+        BalanceChange, SimulationConfig, SimulationResult, SimulationRiskLevel,
+        SimulationSafetyReport, SwapPreview, TokenBalanceChange, TransactionSimulator,
+    };
+
+    // Program safety
+    pub use crate::program_safety::{
+        ProgramRiskLevel, ProgramSafetyAnalyzer, ProgramSafetyReport, ProgramWarning,
+    };
+
+    // MEV protection
+    pub use crate::mev_protection::{
+        JitoBundle, MevProtection, PriorityFeeRecommendation,
+        SandwichRisk, JITO_TIP_ACCOUNTS, calculate_optimal_slippage,
+    };
+
+    // NFT safety
+    pub use crate::nft_safety::{
+        CollectionConfig, FakeIndicator, NftCollection, NftCreator, NftMetadata,
+        NftRiskLevel, NftSafetyAnalyzer, NftSafetyReport, KNOWN_COLLECTIONS,
+        METAPLEX_METADATA_PROGRAM,
     };
 
     #[cfg(feature = "jupiter")]

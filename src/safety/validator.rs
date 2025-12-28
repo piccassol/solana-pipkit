@@ -3,9 +3,14 @@
 //! Combines address verification and amount validation into a unified
 //! safety check for transfers.
 
+use crate::mev_protection::{MevProtection, SandwichRisk};
+use crate::nft_safety::{NftSafetyAnalyzer, NftSafetyReport};
+use crate::program_safety::{ProgramSafetyAnalyzer, ProgramSafetyReport, ProgramRiskLevel};
+use crate::simulation::{SimulationConfig, SimulationSafetyReport, TransactionSimulator};
 use crate::{Result, ToolkitError};
 use solana_client::rpc_client::RpcClient;
 use solana_sdk::pubkey::Pubkey;
+use solana_sdk::transaction::Transaction;
 use spl_token::{solana_program::program_pack::Pack, state::Account as TokenAccount};
 
 use super::address_verify::AddressVerifier;
@@ -659,6 +664,324 @@ impl SafetyProtocol {
                 RiskLevel::Medium,
             ),
         }
+    }
+}
+
+/// Comprehensive safety report combining all safety analyses.
+///
+/// This aggregates results from:
+/// - Transaction simulation
+/// - Program safety analysis
+/// - MEV/sandwich attack risk
+/// - NFT authenticity (when applicable)
+/// - Token safety (when applicable)
+#[derive(Debug, Clone)]
+pub struct ComprehensiveSafetyReport {
+    /// Whether the transaction is approved overall.
+    pub approved: bool,
+    /// Overall risk level (highest of all checks).
+    pub overall_risk: RiskLevel,
+    /// All warnings from all checks.
+    pub warnings: Vec<String>,
+    /// All blockers from all checks.
+    pub blockers: Vec<String>,
+    /// Transaction simulation result.
+    pub simulation: Option<SimulationSafetyReport>,
+    /// Program safety reports for each program in the transaction.
+    pub program_reports: Vec<ProgramSafetyReport>,
+    /// MEV/sandwich attack risk analysis.
+    pub mev_risk: Option<SandwichRisk>,
+    /// NFT safety report (for NFT transactions).
+    pub nft_report: Option<NftSafetyReport>,
+    /// Token safety report (for token transactions).
+    pub token_report: Option<TokenSafetyReport>,
+    /// Recommended priority fee in microlamports.
+    pub recommended_priority_fee: Option<u64>,
+}
+
+impl ComprehensiveSafetyReport {
+    /// Create a new comprehensive report.
+    pub fn new() -> Self {
+        Self {
+            approved: true,
+            overall_risk: RiskLevel::Low,
+            warnings: Vec::new(),
+            blockers: Vec::new(),
+            simulation: None,
+            program_reports: Vec::new(),
+            mev_risk: None,
+            nft_report: None,
+            token_report: None,
+            recommended_priority_fee: None,
+        }
+    }
+
+    /// Add a warning and update risk level.
+    pub fn add_warning(&mut self, warning: impl Into<String>, level: RiskLevel) {
+        self.warnings.push(warning.into());
+        if level > self.overall_risk {
+            self.overall_risk = level;
+        }
+    }
+
+    /// Add a blocker and mark as not approved.
+    pub fn add_blocker(&mut self, blocker: impl Into<String>) {
+        self.blockers.push(blocker.into());
+        self.approved = false;
+        self.overall_risk = RiskLevel::Critical;
+    }
+
+    /// Check if the transaction is safe to proceed.
+    pub fn is_safe(&self) -> bool {
+        self.approved && self.overall_risk < RiskLevel::High
+    }
+
+    /// Check if confirmation is required.
+    pub fn requires_confirmation(&self) -> bool {
+        self.overall_risk >= RiskLevel::High
+    }
+
+    /// Get a summary of all issues.
+    pub fn summary(&self) -> String {
+        let status = if self.approved { "APPROVED" } else { "BLOCKED" };
+        let mut lines = vec![format!(
+            "Comprehensive Safety Report: {} (Risk: {})",
+            status, self.overall_risk
+        )];
+
+        if let Some(ref sim) = self.simulation {
+            lines.push(format!("Simulation: {} ({})",
+                if sim.safe { "PASSED" } else { "FAILED" },
+                sim.risk_level
+            ));
+        }
+
+        if !self.program_reports.is_empty() {
+            let unsafe_programs: Vec<_> = self.program_reports
+                .iter()
+                .filter(|p| p.risk_level >= crate::program_safety::ProgramRiskLevel::High)
+                .map(|p| p.program_id.to_string())
+                .collect();
+            if !unsafe_programs.is_empty() {
+                lines.push(format!("Unsafe programs: {}", unsafe_programs.join(", ")));
+            }
+        }
+
+        if let Some(ref mev) = self.mev_risk {
+            let risk_str = if mev.is_risky { "HIGH" } else { "LOW" };
+            lines.push(format!("MEV Risk: {} (score: {})", risk_str, mev.risk_score));
+        }
+
+        if !self.warnings.is_empty() {
+            lines.push(format!("Warnings ({}):", self.warnings.len()));
+            for w in &self.warnings {
+                lines.push(format!("  - {}", w));
+            }
+        }
+
+        if !self.blockers.is_empty() {
+            lines.push(format!("Blockers ({}):", self.blockers.len()));
+            for b in &self.blockers {
+                lines.push(format!("  - {}", b));
+            }
+        }
+
+        lines.join("\n")
+    }
+}
+
+impl Default for ComprehensiveSafetyReport {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Comprehensive safety analyzer combining all safety modules.
+pub struct ComprehensiveSafetyAnalyzer {
+    simulator: TransactionSimulator,
+    program_analyzer: ProgramSafetyAnalyzer,
+    mev_protection: MevProtection,
+    nft_analyzer: NftSafetyAnalyzer,
+    token_checker: TokenSafetyChecker,
+    simulation_config: SimulationConfig,
+}
+
+impl ComprehensiveSafetyAnalyzer {
+    /// Create a new comprehensive analyzer.
+    pub fn new(rpc_url: &str) -> Self {
+        Self {
+            simulator: TransactionSimulator::new(rpc_url),
+            program_analyzer: ProgramSafetyAnalyzer::new(rpc_url),
+            mev_protection: MevProtection::new(rpc_url),
+            nft_analyzer: NftSafetyAnalyzer::new(rpc_url),
+            token_checker: TokenSafetyChecker::new(),
+            simulation_config: SimulationConfig::default(),
+        }
+    }
+
+    /// Set simulation configuration.
+    pub fn with_simulation_config(mut self, config: SimulationConfig) -> Self {
+        self.simulation_config = config;
+        self
+    }
+
+    /// Add a program to the blocklist.
+    pub fn block_program(&mut self, program: Pubkey, reason: String) {
+        self.program_analyzer.add_to_blocklist(program, reason);
+    }
+
+    /// Add a program to the safelist.
+    pub fn trust_program(&mut self, program: Pubkey) {
+        self.program_analyzer.add_to_safe_list(program);
+    }
+
+    /// Analyze a transaction comprehensively.
+    ///
+    /// Performs:
+    /// 1. Transaction simulation
+    /// 2. Program safety analysis for each program
+    /// 3. MEV risk analysis
+    pub fn analyze_transaction(
+        &self,
+        transaction: &Transaction,
+        _swap_amount: Option<u64>,
+    ) -> Result<ComprehensiveSafetyReport> {
+        let mut report = ComprehensiveSafetyReport::new();
+
+        // 1. Simulate transaction
+        let sim_result = self.simulator.simulate_and_validate(
+            transaction,
+            &self.simulation_config,
+        )?;
+
+        if !sim_result.safe {
+            for blocker in &sim_result.blockers {
+                report.add_blocker(blocker.clone());
+            }
+        }
+        for warning in &sim_result.warnings {
+            report.add_warning(warning.clone(), RiskLevel::Medium);
+        }
+        report.simulation = Some(sim_result);
+
+        // 2. Analyze each program in the transaction
+        let programs: Vec<Pubkey> = transaction
+            .message
+            .account_keys
+            .iter()
+            .filter(|key| {
+                transaction.message.is_key_called_as_program(
+                    transaction.message.account_keys.iter().position(|k| k == *key).unwrap()
+                )
+            })
+            .cloned()
+            .collect();
+
+        for program in programs {
+            let program_report = self.program_analyzer.analyze(&program)?;
+
+            // Check if program risk level is high or critical
+            if program_report.risk_level >= ProgramRiskLevel::High {
+                report.add_blocker(format!(
+                    "Unsafe program {}: {}",
+                    program,
+                    program_report.risk_level
+                ));
+            }
+
+            for warning in &program_report.warnings {
+                report.add_warning(warning.description(), RiskLevel::Medium);
+            }
+
+            report.program_reports.push(program_report);
+        }
+
+        // 3. MEV risk analysis
+        let mev_risk = self.mev_protection.analyze_sandwich_risk(transaction);
+
+        if mev_risk.is_risky {
+            for reason in &mev_risk.reasons {
+                report.add_warning(
+                    format!("MEV risk: {}", reason),
+                    RiskLevel::Medium,
+                );
+            }
+        }
+
+        report.mev_risk = Some(mev_risk);
+
+        // 4. Get priority fee recommendation
+        if let Ok(fee_rec) = self.mev_protection.get_priority_fee_recommendation() {
+            report.recommended_priority_fee = Some(fee_rec.medium);
+        }
+
+        Ok(report)
+    }
+
+    /// Analyze an NFT purchase.
+    pub fn analyze_nft_purchase(
+        &self,
+        nft_mint: &Pubkey,
+        transaction: &Transaction,
+    ) -> Result<ComprehensiveSafetyReport> {
+        let mut report = self.analyze_transaction(transaction, None)?;
+
+        // Add NFT safety analysis
+        let nft_report = self.nft_analyzer.analyze(nft_mint)?;
+
+        if !nft_report.authentic {
+            report.add_blocker(format!(
+                "NFT may be fake: {} indicators found",
+                nft_report.fake_indicators.len()
+            ));
+        }
+
+        for indicator in &nft_report.fake_indicators {
+            report.add_warning(indicator.to_string(), RiskLevel::High);
+        }
+
+        for warning in &nft_report.warnings {
+            report.add_warning(warning.clone(), RiskLevel::Medium);
+        }
+
+        report.nft_report = Some(nft_report);
+
+        Ok(report)
+    }
+
+    /// Analyze a token swap.
+    pub fn analyze_token_swap(
+        &self,
+        client: &RpcClient,
+        token_mint: &Pubkey,
+        transaction: &Transaction,
+        swap_amount: u64,
+    ) -> Result<ComprehensiveSafetyReport> {
+        let mut report = self.analyze_transaction(transaction, Some(swap_amount))?;
+
+        // Add token safety analysis
+        let token_report = self.token_checker.analyze_token(client, token_mint)?;
+
+        if token_report.risk_level == TokenRiskLevel::Critical {
+            report.add_blocker(format!(
+                "Token has critical risk: score {}/100",
+                token_report.risk_score
+            ));
+        }
+
+        for indicator in &token_report.indicators {
+            let level = match indicator {
+                RiskIndicator::NotInitialized => RiskLevel::Critical,
+                RiskIndicator::ActiveMintAuthority |
+                RiskIndicator::ActiveFreezeAuthority => RiskLevel::High,
+                _ => RiskLevel::Medium,
+            };
+            report.add_warning(format!("{:?}", indicator), level);
+        }
+
+        report.token_report = Some(token_report);
+
+        Ok(report)
     }
 }
 
