@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2024-12-28
+
+### Added
+
+- **Transaction Simulation** (`simulation` module)
+  - `TransactionSimulator` for previewing transaction outcomes
+  - `SimulationResult` with balance changes and compute units
+  - `SimulationConfig` for validation thresholds
+  - `SimulationSafetyReport` with risk levels
+  - `SwapPreview` for DEX swap outcome previews
+
+- **Program Safety Analysis** (`program_safety` module)
+  - `ProgramSafetyAnalyzer` for analyzing program risks
+  - `ProgramSafetyReport` with upgrade authority detection
+  - `ProgramRiskLevel` enum (Safe, Low, Medium, High, Critical)
+  - Default safe programs list (System, Token, Jupiter, Raydium, Orca, etc.)
+  - Blocklist/safelist management
+
+- **MEV Protection** (`mev_protection` module)
+  - `MevProtection` helper for sandwich attack prevention
+  - `SandwichRisk` analysis for DEX transactions
+  - `PriorityFeeRecommendation` based on recent network activity
+  - `JitoBundle` creation for MEV-protected transactions
+  - 8 Jito tip account addresses
+  - `calculate_optimal_slippage()` helper
+
+- **NFT Safety** (`nft_safety` module)
+  - `NftSafetyAnalyzer` for detecting fake NFTs
+  - `NftSafetyReport` with authenticity assessment
+  - `FakeIndicator` enum for specific red flags
+  - `NftRiskLevel` enum (Verified, LikelyAuthentic, Uncertain, Suspicious, Fake)
+  - Known collections list (DeGods, y00ts, Mad Lads, etc.)
+  - Metaplex metadata validation
+
+- **Comprehensive Safety Integration**
+  - `ComprehensiveSafetyReport` aggregating all safety modules
+  - `ComprehensiveSafetyAnalyzer` for full transaction analysis
+  - Integration with existing `SafetyProtocol`
+
 ## [1.1.0] - 2024-12-28
 
 ### Added
