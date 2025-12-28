@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2024-12-28
+
+### Added
+
+- **Token Safety Checker** (`token_safety` module)
+  - `TokenSafetyChecker` for rug pull detection
+  - `RiskIndicator` enum for specific red flags
+  - `TokenSafetyReport` with 0-100 risk scoring
+  - Holder distribution analysis
+  - Mint/freeze authority detection
+
+- **Token Transfer Validation**
+  - `validate_token_transfer()` for full token safety validation
+  - Token risks integrated into SafetyReport warnings
+  - Critical risk tokens automatically blocked
+
 ## [1.0.1] - 2024-12-27
 
 ### Fixed
