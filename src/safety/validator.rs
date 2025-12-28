@@ -6,9 +6,13 @@
 use crate::{Result, ToolkitError};
 use solana_client::rpc_client::RpcClient;
 use solana_sdk::pubkey::Pubkey;
+use spl_token::{solana_program::program_pack::Pack, state::Account as TokenAccount};
 
 use super::address_verify::AddressVerifier;
 use super::amount_validation::AmountValidator;
+use super::token_safety::{
+    HolderDistribution, RiskIndicator, TokenRiskLevel, TokenSafetyChecker, TokenSafetyReport,
+};
 
 /// Risk level for a transaction.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -65,6 +69,8 @@ pub struct SafetyReport {
     pub amount_display: String,
     /// Whether user confirmation is required.
     pub requires_confirmation: bool,
+    /// Token safety report (for token transfers).
+    pub token_report: Option<TokenSafetyReport>,
 }
 
 impl SafetyReport {
@@ -79,7 +85,14 @@ impl SafetyReport {
             to_display: AddressVerifier::format_address_short(to),
             amount_display,
             requires_confirmation: false,
+            token_report: None,
         }
+    }
+
+    /// Set the token report.
+    fn with_token_report(mut self, report: TokenSafetyReport) -> Self {
+        self.token_report = Some(report);
+        self
     }
 
     /// Add a warning and adjust risk level.
@@ -370,6 +383,283 @@ impl SafetyProtocol {
 
         report
     }
+
+    /// Validate a token transfer including token safety analysis.
+    ///
+    /// Performs comprehensive validation:
+    /// 1. Analyze token for rug pull indicators
+    /// 2. Verify sender and recipient addresses
+    /// 3. Check token account balance
+    /// 4. Validate amount
+    /// 5. Aggregate all risks into SafetyReport
+    ///
+    /// # Arguments
+    /// * `client` - RPC client for queries
+    /// * `token_mint` - Token mint address
+    /// * `from` - Sender wallet pubkey
+    /// * `to` - Recipient wallet pubkey
+    /// * `amount` - Amount in base units
+    ///
+    /// # Returns
+    /// SafetyReport with token risks, address validation, and amount checks
+    pub fn validate_token_transfer(
+        &self,
+        client: &RpcClient,
+        token_mint: &Pubkey,
+        from: &Pubkey,
+        to: &Pubkey,
+        amount: u64,
+    ) -> Result<SafetyReport> {
+        // 1. Analyze token safety
+        let token_checker = TokenSafetyChecker::new();
+        let token_report = token_checker.analyze_token(client, token_mint)?;
+
+        let decimals = token_report.decimals;
+        let amount_display = AmountValidator::format_amount(amount, decimals);
+
+        let mut report = SafetyReport::approved(from, to, amount_display)
+            .with_token_report(token_report.clone());
+
+        // Add token risk warnings based on indicators
+        for indicator in &token_report.indicators {
+            let (warning, level) = self.indicator_to_warning(indicator);
+            report.add_warning(warning, level);
+        }
+
+        // If token is critical risk, block the transfer
+        if token_report.risk_level == TokenRiskLevel::Critical {
+            report.add_blocker(format!(
+                "Token has critical risk score: {}/100",
+                token_report.risk_score
+            ));
+        }
+
+        // 2. Verify addresses
+        if let Err(e) = AddressVerifier::verify_address(&from.to_string()) {
+            report.add_blocker(format!("Invalid sender address: {}", e));
+        }
+
+        if let Err(e) = AddressVerifier::verify_address(&to.to_string()) {
+            report.add_blocker(format!("Invalid recipient address: {}", e));
+        }
+
+        if from == to {
+            report.add_warning("Sending to yourself".to_string(), RiskLevel::Medium);
+        }
+
+        // 3. Get token account balance
+        let from_ata = spl_associated_token_account::get_associated_token_address(from, token_mint);
+        let balance = match client.get_account(&from_ata) {
+            Ok(account) => {
+                TokenAccount::unpack(&account.data)
+                    .map(|ta| ta.amount)
+                    .unwrap_or(0)
+            }
+            Err(_) => 0,
+        };
+
+        // 4. Validate amount
+        let validation = AmountValidator::validate_amount(amount, decimals, balance);
+
+        if !validation.is_valid {
+            for warning in &validation.warnings {
+                if warning.contains("exceeds balance") || warning.contains("zero") {
+                    report.add_blocker(warning.clone());
+                }
+            }
+        }
+
+        for warning in &validation.warnings {
+            if !warning.contains("exceeds balance") && !warning.contains("zero") {
+                let level = if warning.contains("entire balance") {
+                    RiskLevel::High
+                } else if warning.contains("%") {
+                    RiskLevel::Medium
+                } else {
+                    RiskLevel::Low
+                };
+                report.add_warning(warning.clone(), level);
+            }
+        }
+
+        // 5. Check large amounts
+        if let Some(price) = self.token_price_usd {
+            let human_amount = AmountValidator::token_to_human_amount(amount, decimals);
+            let usd_value = human_amount * price;
+
+            if AmountValidator::requires_confirmation(usd_value, self.large_amount_threshold_usd) {
+                report.add_warning(
+                    format!(
+                        "Large transfer: ~${:.2} USD exceeds ${:.0} threshold",
+                        usd_value, self.large_amount_threshold_usd
+                    ),
+                    RiskLevel::High,
+                );
+            }
+        }
+
+        // Strict mode
+        if self.strict_mode && !report.warnings.is_empty() {
+            let warnings: Vec<String> = report.warnings.drain(..).collect();
+            for warning in warnings {
+                report.add_blocker(format!("STRICT: {}", warning));
+            }
+        }
+
+        Ok(report)
+    }
+
+    /// Validate token transfer without RPC (for testing).
+    ///
+    /// Uses provided token data instead of fetching from chain.
+    pub fn validate_token_transfer_offline(
+        &self,
+        token_mint: Pubkey,
+        from: &Pubkey,
+        to: &Pubkey,
+        amount: u64,
+        balance: u64,
+        decimals: u8,
+        mint_authority: Option<Pubkey>,
+        freeze_authority: Option<Pubkey>,
+        holder_distribution: Option<HolderDistribution>,
+    ) -> SafetyReport {
+        // Create token report from provided data
+        let token_checker = TokenSafetyChecker::new();
+        let token_report = token_checker.analyze_from_data(
+            token_mint,
+            1_000_000_000, // Dummy supply
+            decimals,
+            mint_authority,
+            freeze_authority,
+            holder_distribution,
+        );
+
+        let amount_display = AmountValidator::format_amount(amount, decimals);
+        let mut report = SafetyReport::approved(from, to, amount_display)
+            .with_token_report(token_report.clone());
+
+        // Add token risk warnings
+        for indicator in &token_report.indicators {
+            let (warning, level) = self.indicator_to_warning(indicator);
+            report.add_warning(warning, level);
+        }
+
+        if token_report.risk_level == TokenRiskLevel::Critical {
+            report.add_blocker(format!(
+                "Token has critical risk score: {}/100",
+                token_report.risk_score
+            ));
+        }
+
+        // Verify addresses
+        if let Err(e) = AddressVerifier::verify_address(&from.to_string()) {
+            report.add_blocker(format!("Invalid sender address: {}", e));
+        }
+
+        if let Err(e) = AddressVerifier::verify_address(&to.to_string()) {
+            report.add_blocker(format!("Invalid recipient address: {}", e));
+        }
+
+        if from == to {
+            report.add_warning("Sending to yourself".to_string(), RiskLevel::Medium);
+        }
+
+        // Validate amount
+        let validation = AmountValidator::validate_amount(amount, decimals, balance);
+
+        if !validation.is_valid {
+            for warning in &validation.warnings {
+                if warning.contains("exceeds balance") || warning.contains("zero") {
+                    report.add_blocker(warning.clone());
+                }
+            }
+        }
+
+        for warning in &validation.warnings {
+            if !warning.contains("exceeds balance") && !warning.contains("zero") {
+                let level = if warning.contains("entire balance") {
+                    RiskLevel::High
+                } else if warning.contains("%") {
+                    RiskLevel::Medium
+                } else {
+                    RiskLevel::Low
+                };
+                report.add_warning(warning.clone(), level);
+            }
+        }
+
+        // Large amount check
+        if let Some(price) = self.token_price_usd {
+            let human_amount = AmountValidator::token_to_human_amount(amount, decimals);
+            let usd_value = human_amount * price;
+
+            if AmountValidator::requires_confirmation(usd_value, self.large_amount_threshold_usd) {
+                report.add_warning(
+                    format!(
+                        "Large transfer: ~${:.2} USD exceeds ${:.0} threshold",
+                        usd_value, self.large_amount_threshold_usd
+                    ),
+                    RiskLevel::High,
+                );
+            }
+        }
+
+        // Strict mode
+        if self.strict_mode && !report.warnings.is_empty() {
+            let warnings: Vec<String> = report.warnings.drain(..).collect();
+            for warning in warnings {
+                report.add_blocker(format!("STRICT: {}", warning));
+            }
+        }
+
+        report
+    }
+
+    /// Convert token risk indicator to warning message and level.
+    fn indicator_to_warning(&self, indicator: &RiskIndicator) -> (String, RiskLevel) {
+        match indicator {
+            RiskIndicator::ActiveMintAuthority => (
+                "Token has active mint authority (can print unlimited tokens)".to_string(),
+                RiskLevel::High,
+            ),
+            RiskIndicator::ActiveFreezeAuthority => (
+                "Token has active freeze authority (can freeze your wallet)".to_string(),
+                RiskLevel::High,
+            ),
+            RiskIndicator::HighHolderConcentration { top_10_percent } => (
+                format!(
+                    "High holder concentration: top 10 own {:.1}% of supply",
+                    top_10_percent
+                ),
+                if *top_10_percent > 80.0 {
+                    RiskLevel::High
+                } else {
+                    RiskLevel::Medium
+                },
+            ),
+            RiskIndicator::LowHolderCount { count } => (
+                format!("Low holder count: only {} holders", count),
+                if *count < 50 {
+                    RiskLevel::High
+                } else {
+                    RiskLevel::Medium
+                },
+            ),
+            RiskIndicator::LowSupply { supply } => (
+                format!("Token has zero or very low supply: {}", supply),
+                RiskLevel::Medium,
+            ),
+            RiskIndicator::NotInitialized => (
+                "Token mint not properly initialized".to_string(),
+                RiskLevel::Critical,
+            ),
+            RiskIndicator::SuspiciousMetadata { reason } => (
+                format!("Suspicious token metadata: {}", reason),
+                RiskLevel::Medium,
+            ),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -596,5 +886,235 @@ mod tests {
         assert!(report.warnings.len() >= 2);
         // Risk level should be highest of all warnings
         assert!(report.risk_level >= RiskLevel::High);
+    }
+
+    // Token transfer validation tests
+
+    #[test]
+    fn test_safe_token_transfer_approved() {
+        let protocol = SafetyProtocol::new();
+        let from = test_pubkey_1();
+        let to = test_pubkey_2();
+        let mint = Pubkey::new_unique();
+
+        // Safe token: no authorities, good distribution
+        let distribution = HolderDistribution {
+            holder_count: 500,
+            top_1_percent: 5.0,
+            top_5_percent: 15.0,
+            top_10_percent: 25.0,
+            top_holders: vec![],
+        };
+
+        let report = protocol.validate_token_transfer_offline(
+            mint,
+            &from,
+            &to,
+            1_000_000, // 1 token (6 decimals)
+            10_000_000, // 10 tokens balance
+            6,
+            None, // No mint authority
+            None, // No freeze authority
+            Some(distribution),
+        );
+
+        assert!(report.approved);
+        assert!(report.token_report.is_some());
+        assert_eq!(report.token_report.as_ref().unwrap().risk_level, TokenRiskLevel::Safe);
+    }
+
+    #[test]
+    fn test_token_with_mint_authority_warning() {
+        let protocol = SafetyProtocol::new();
+        let from = test_pubkey_1();
+        let to = test_pubkey_2();
+        let mint = Pubkey::new_unique();
+        let authority = Pubkey::new_unique();
+
+        let report = protocol.validate_token_transfer_offline(
+            mint,
+            &from,
+            &to,
+            1_000_000,
+            10_000_000,
+            6,
+            Some(authority), // Active mint authority
+            None,
+            None,
+        );
+
+        assert!(report.approved); // Still approved but with warning
+        assert!(report.warnings.iter().any(|w| w.contains("mint authority")));
+        assert!(report.risk_level >= RiskLevel::High);
+    }
+
+    #[test]
+    fn test_token_with_freeze_authority_warning() {
+        let protocol = SafetyProtocol::new();
+        let from = test_pubkey_1();
+        let to = test_pubkey_2();
+        let mint = Pubkey::new_unique();
+        let authority = Pubkey::new_unique();
+
+        let report = protocol.validate_token_transfer_offline(
+            mint,
+            &from,
+            &to,
+            1_000_000,
+            10_000_000,
+            6,
+            None,
+            Some(authority), // Active freeze authority
+            None,
+        );
+
+        assert!(report.approved);
+        assert!(report.warnings.iter().any(|w| w.contains("freeze")));
+    }
+
+    #[test]
+    fn test_token_high_concentration_warning() {
+        let protocol = SafetyProtocol::new();
+        let from = test_pubkey_1();
+        let to = test_pubkey_2();
+        let mint = Pubkey::new_unique();
+
+        // Dangerous distribution: top 10 own 85%
+        let distribution = HolderDistribution {
+            holder_count: 200,
+            top_1_percent: 40.0,
+            top_5_percent: 70.0,
+            top_10_percent: 85.0,
+            top_holders: vec![],
+        };
+
+        let report = protocol.validate_token_transfer_offline(
+            mint,
+            &from,
+            &to,
+            1_000_000,
+            10_000_000,
+            6,
+            None,
+            None,
+            Some(distribution),
+        );
+
+        assert!(report.warnings.iter().any(|w| w.contains("concentration")));
+    }
+
+    #[test]
+    fn test_token_low_holder_count_warning() {
+        let protocol = SafetyProtocol::new();
+        let from = test_pubkey_1();
+        let to = test_pubkey_2();
+        let mint = Pubkey::new_unique();
+
+        // Only 30 holders
+        let distribution = HolderDistribution {
+            holder_count: 30,
+            top_1_percent: 10.0,
+            top_5_percent: 30.0,
+            top_10_percent: 45.0,
+            top_holders: vec![],
+        };
+
+        let report = protocol.validate_token_transfer_offline(
+            mint,
+            &from,
+            &to,
+            1_000_000,
+            10_000_000,
+            6,
+            None,
+            None,
+            Some(distribution),
+        );
+
+        assert!(report.warnings.iter().any(|w| w.contains("holder")));
+    }
+
+    #[test]
+    fn test_critical_token_blocked() {
+        let protocol = SafetyProtocol::new();
+        let from = test_pubkey_1();
+        let to = test_pubkey_2();
+        let mint = Pubkey::new_unique();
+        let authority = Pubkey::new_unique();
+
+        // Token with multiple red flags = critical
+        let distribution = HolderDistribution {
+            holder_count: 10, // Very low
+            top_1_percent: 60.0,
+            top_5_percent: 85.0,
+            top_10_percent: 95.0, // Extreme concentration
+            top_holders: vec![],
+        };
+
+        let report = protocol.validate_token_transfer_offline(
+            mint,
+            &from,
+            &to,
+            1_000_000,
+            10_000_000,
+            6,
+            Some(authority), // Can print more
+            Some(authority), // Can freeze
+            Some(distribution),
+        );
+
+        // Critical risk tokens should be blocked
+        assert!(!report.approved);
+        assert!(report.blockers.iter().any(|b| b.contains("critical risk")));
+    }
+
+    #[test]
+    fn test_token_transfer_with_amount_validation() {
+        let protocol = SafetyProtocol::new();
+        let from = test_pubkey_1();
+        let to = test_pubkey_2();
+        let mint = Pubkey::new_unique();
+
+        // Try to send more than balance
+        let report = protocol.validate_token_transfer_offline(
+            mint,
+            &from,
+            &to,
+            100_000_000, // 100 tokens
+            10_000_000,  // Only 10 tokens balance
+            6,
+            None,
+            None,
+            None,
+        );
+
+        assert!(!report.approved);
+        assert!(report.blockers.iter().any(|b| b.contains("exceeds balance")));
+    }
+
+    #[test]
+    fn test_token_transfer_includes_token_report() {
+        let protocol = SafetyProtocol::new();
+        let from = test_pubkey_1();
+        let to = test_pubkey_2();
+        let mint = Pubkey::new_unique();
+
+        let report = protocol.validate_token_transfer_offline(
+            mint,
+            &from,
+            &to,
+            1_000_000,
+            10_000_000,
+            6,
+            None,
+            None,
+            None,
+        );
+
+        // Token report should be included
+        assert!(report.token_report.is_some());
+        let token_report = report.token_report.unwrap();
+        assert_eq!(token_report.mint, mint);
+        assert_eq!(token_report.decimals, 6);
     }
 }
