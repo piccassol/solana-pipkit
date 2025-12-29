@@ -61,7 +61,10 @@ Or add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-solana-pipkit = "1.2.0"
+solana-pipkit = "1.3.0"
+
+# Enable high-performance trading features
+solana-pipkit = { version = "1.3.0", features = ["speed"] }
 ```
 
 ---
@@ -85,6 +88,53 @@ solana-pipkit = "1.2.0"
 
 - **Safety Protocol**
   Client-side validation to prevent costly transaction mistakes
+
+- **Speed Module** *(v1.3.0 "Lightning")*
+  High-performance execution for trading agents with connection pooling, blockhash caching, and optimized swaps
+
+---
+
+## Speed Module
+
+Built for trading bots and agents that need minimal latency. The speed module provides optimized RPC clients, instant transaction building, and fast swap execution.
+
+```rust
+use solana_pipkit::speed::prelude::*;
+use solana_sdk::signature::Keypair;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Multi-endpoint RPC with automatic failover
+    let rpc = FastRpcClient::new(vec![
+        "https://api.mainnet-beta.solana.com".into(),
+        "https://solana-api.projectserum.com".into(),
+    ]);
+
+    // Benchmark and use fastest endpoint
+    rpc.set_strategy(LoadBalanceStrategy::LeastLatency);
+    let health = rpc.benchmark_endpoints().await;
+    println!("Fastest: {} ({}ms)", health[0].url, health[0].latency_ms);
+
+    // Fast swap execution
+    let payer = Keypair::new();
+    let executor = SwapExecutor::new(rpc, payer);
+
+    let result = executor.swap_fast(
+        &mints::USDC,
+        &mints::SOL,
+        1_000_000,  // 1 USDC
+        SwapConfig::fast(),  // High priority, direct routes
+    ).await?;
+
+    println!("Swapped in {}ms", result.execution_time_ms);
+    Ok(())
+}
+```
+
+**Performance targets:**
+- Cached blockhash retrieval: **0ms**
+- ATA computation: **<50us**
+- Quote to execution: **<500ms**
 
 ---
 
