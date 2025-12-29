@@ -17,11 +17,13 @@
 //! - **Program Safety**: Analyze programs for safety before interaction
 //! - **MEV Protection**: Jito bundles and sandwich attack protection
 //! - **NFT Safety**: Verify NFT authenticity and detect counterfeits
+//! - **Speed Module**: High-performance execution for trading agents (optional)
 //!
 //! ## Feature Flags
 //!
 //! - `anchor` - Enable Anchor framework helpers and CPI utilities
 //! - `jupiter` - Enable Jupiter DEX integration for token swaps
+//! - `speed` - Enable high-performance trading module (v1.3.0 "Lightning")
 //! - `all` - Enable all optional features
 //!
 //! ## Quick Start
@@ -64,6 +66,9 @@ pub mod transaction;
 
 #[cfg(feature = "jupiter")]
 pub mod jupiter;
+
+#[cfg(feature = "speed")]
+pub mod speed;
 
 pub use error::{Result, ToolkitError};
 
@@ -140,4 +145,7 @@ pub mod prelude {
 
     #[cfg(feature = "jupiter")]
     pub use crate::jupiter::*;
+
+    #[cfg(feature = "speed")]
+    pub use crate::speed::prelude::*;
 }
