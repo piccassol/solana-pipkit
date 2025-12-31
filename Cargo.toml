@@ -48,7 +48,9 @@ thiserror = "1.0"
 anyhow = "1.0"
 bs58 = "0.5"
 lazy_static = "1.4"
-base64 = "0.21" 
+base64 = "0.21"
+aes-gcm = { version = "0.10", optional = true }
+rand = { version = "0.8", optional = true } 
 
 # Jupiter integration
 reqwest = { version = "0.11", features = ["json"], optional = true }
@@ -60,6 +62,8 @@ tonic = { version = "0.10", optional = true }
 # Add shellexpand dependency (missing)
 shellexpand = "3.0"
 futures = "0.3"
+futures-util = { version = "0.3", optional = true }
+tokio-tungstenite = { version = "0.20", optional = true }
 
 [dev-dependencies]
 tokio-test = "0.4"
@@ -74,4 +78,6 @@ analytics = []
 defi = []
 safety = []
 speed = ["jito"]
-all = ["anchor", "jupiter", "jito", "analytics", "defi", "safety", "speed"]
+multi-agent = ["aes-gcm", "tokio-tungstenite", "futures-util", "rand"]
+agent-analytics = []
+all = ["anchor", "jupiter", "jito", "analytics", "defi", "safety", "speed", "multi-agent", "agent-analytics"]

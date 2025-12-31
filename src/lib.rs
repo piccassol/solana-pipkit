@@ -9,6 +9,8 @@
 //! - **Speed**: Multi-RPC pooling, blockhash caching, sniper module, Jito bundles
 //! - **Analytics**: Wallet profiling, holder analysis, pattern detection, PnL tracking
 //! - **DeFi**: Pool interactions, liquidity provision, yield farming, LP token parsing
+//! - **Multi-Agent**: Agent coordination, messaging, encryption, task marketplace
+//! - **Agent Analytics**: Agent classification, interaction graphs, risk scoring
 //!
 //! ## Feature Flags
 //!
@@ -19,6 +21,8 @@
 //! - `defi` - DeFi protocol integrations
 //! - `safety` - Transaction safety validation
 //! - `speed` - Performance optimizations
+//! - `multi-agent` - Multi-agent coordination primitives
+//! - `agent-analytics` - Agent-specific analytics and profiling
 //! - `all` - Enable all features
 
 pub mod account_utils;
@@ -49,6 +53,12 @@ pub mod analytics;
 #[cfg(feature = "defi")]
 pub mod defi;
 
+#[cfg(feature = "multi-agent")]
+pub mod multi_agent;
+
+#[cfg(feature = "agent-analytics")]
+pub mod agent_analytics;
+
 pub use error::{Result, ToolkitError};
 
 /// Common imports for quick access
@@ -73,4 +83,10 @@ pub mod prelude {
 
     #[cfg(feature = "defi")]
     pub use crate::defi::*;
+
+    #[cfg(feature = "multi-agent")]
+    pub use crate::multi_agent::*;
+
+    #[cfg(feature = "agent-analytics")]
+    pub use crate::agent_analytics::*;
 }
