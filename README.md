@@ -49,7 +49,7 @@
 **solana-pipkit** is a Rust utility crate designed to streamline common tasks in **Solana program and client development**.
 It focuses on ergonomics, safety, and reusable patterns for production-grade Solana workflows.
 
-As of version **2.0.0**, solana-pipkit represents a stable, cohesive client-side framework for building trading systems, wallets, bots, analytics pipelines, and developer tooling on Solana.
+As of version **2.1.0**, solana-pipkit represents a stable, cohesive client-side framework for building trading systems, wallets, bots, analytics pipelines, and developer tooling on Solana.
 
 ---
 
@@ -63,10 +63,10 @@ Or add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-solana-pipkit = "2.0.0"
+solana-pipkit = "2.1.0"
 
 # Enable high-performance trading features
-solana-pipkit = { version = "2.0.0", features = ["speed"] }
+solana-pipkit = { version = "2.1.0", features = ["speed"] }
 ```
 
 ---
@@ -110,7 +110,104 @@ solana-pipkit = { version = "2.0.0", features = ["speed"] }
   Wallet profiling, PnL analysis, and behavioral classification
 
 - **DeFi Module** (v2.0.0)
-  Pool inspection, LP position tracking, and farming position analysis
+   Pool inspection, LP position tracking, and farming position analysis
+
+- **Multi-Agent Module** (v2.1.0)
+   Secure agent coordination, encrypted messaging, task marketplace, and event streaming
+
+## Analytics Module
+
+The analytics module provides wallet profiling, classification, and behavioral analysis. It helps identify whales, smart money, bots, and track wallet activity patterns.
+
+```rust
+use solana_pipkit::analytics::prelude::*;
+use solana_client::rpc_client::RpcClient;
+use solana_sdk::pubkey::Pubkey;
+use std::str::FromStr;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let rpc = RpcClient::new("https://api.mainnet-beta.solana.com".to_string());
+    let config = AnalyticsConfig::default();
+
+    let profiler = WalletProfiler::new(&rpc, config);
+    let wallet = Pubkey::from_str("TargetWalletAddress...")?;
+
+    let profile = profiler.analyze(&wallet).await?;
+
+    println!("Wallet Classification: {:?}", profile.classification);
+    println!("Activity Level: {:?}", profile.activity_level);
+    println!("Flags: {:?}", profile.flags);
+    println!("SOL Balance: {:.2}", profile.sol_balance);
+    println!("Token Count: {}", profile.token_count);
+
+    Ok(())
+}
+```
+
+**Wallet Classification Types:**
+- `Whale` - High-value holders
+- `SmartMoney` - Known profitable traders and funds
+- `Exchange` - Centralized exchange wallets
+- `Bot` - Automated trading agents
+- `Retail` - Regular users
+- `New` - Recently created wallets
+
+---
+
+## Multi-Agent Module
+
+The multi-agent module provides secure, low-latency coordination primitives for multiple Solana agents. It features PDA-derived agent inboxes, encrypted messaging, task marketplace bidding, and shared event subscriptions.
+
+```rust
+use solana_pipkit::multi_agent::*;
+use solana_client::nonblocking::rpc_client::RpcClient;
+use solana_sdk::{signature::Keypair, pubkey::Pubkey};
+use std::str::FromStr;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = RpcClient::new("https://api.mainnet-beta.solana.com".to_string());
+    let agent = Keypair::new();
+    let target = Pubkey::from_str("TargetAgentAddress...")?;
+
+    // Derive agent inbox PDA
+    let inbox = AgentInbox::derive(&agent.pubkey());
+
+    // Create encryption for private messages
+    let encryptor = MessageEncryptor::new();
+
+    // Post a message to target agent's inbox
+    let payload = b"Execute arbitrage between pools A and B".to_vec();
+    let nonce = encryptor.generate_nonce();
+    let instruction = post_encrypted_message(
+        &inbox.0,
+        &agent.pubkey(),
+        payload,
+        nonce,
+        &encryptor,
+    )?;
+
+    // Send the encrypted message
+    let sig = send_encrypted_message(
+        &client,
+        &target,
+        &agent,
+        payload,
+        &encryptor,
+    ).await?;
+
+    println!("Message sent: {}", sig);
+    Ok(())
+}
+```
+
+**Multi-Agent Features:**
+- **Agent Inboxes** - PDA-derived secure message routing
+- **Encrypted Messaging** - AES-GCM encryption for private agent communication
+- **Task Marketplace** - Bidding system for agent coordination
+- **Event Streaming** - Real-time WebSocket/Geyser subscriptions
+- **Coordinator** - Multi-agent orchestration and broadcast messaging
 
 ---
 
@@ -166,7 +263,7 @@ Simulation is a first-class component in version 2.0.0 and integrates directly w
 
 ## Project Status
 
-Stable major release. Version 2.0.0 marks a consolidated and production-ready API surface. Backwards compatibility will be preserved within the 2.x series.
+Stable major release. Version 2.1.0 adds multi-agent coordination primitives with encrypted messaging and task marketplace capabilities. Backwards compatibility will be preserved within the 2.x series.
 
 Fast chains deserve safe, expressive tooling. solana-pipkit exists to reduce boilerplate, eliminate common footguns, and provide a reliable foundation for Solana client-side infrastructure.
 
