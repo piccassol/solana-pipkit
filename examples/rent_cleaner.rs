@@ -1,6 +1,6 @@
 //! Example: Clean empty token accounts and recover SOL.
 
-use solana_rust_toolkit::rent_cleaner::{RentCleaner, RentCleanerConfig};
+use solana_pipkit::rent_cleaner::{RentCleaner, RentCleanerConfig};
 use solana_sdk::signature::Keypair;
 use std::env;
 
@@ -13,7 +13,6 @@ async fn main() -> anyhow::Result<()> {
     let keypair_data = std::fs::read_to_string(&keypair_path)?;
     let keypair_bytes: Vec<u8> = serde_json::from_str(&keypair_data)?;
     let payer = Keypair::from_bytes(&keypair_bytes)?;
-
     let rpc_url = env::var("RPC_URL").unwrap_or_else(|_| "https://api.mainnet-beta.solana.com".to_string());
 
     println!("Wallet: {}", payer.pubkey());
@@ -29,7 +28,7 @@ async fn main() -> anyhow::Result<()> {
 
     // Find empty accounts
     println!("\nScanning for empty token accounts...");
-    let accounts = cleaner.find_empty_token_accounts().await?;
+    let accounts: Vec<Pubkey> = cleaner.find_empty_token_accounts().await?;
 
     if accounts.is_empty() {
         println!("No empty token accounts found.");

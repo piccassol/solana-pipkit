@@ -1,0 +1,88 @@
+# .clauderc - Solana Pipkit Project Configuration
+
+## Project
+Name: solana-pipkit
+Type: Rust library crate
+Purpose: Pragmatic utilities for Solana development
+
+## Structure
+src/
+  lib.rs              # Main library entry
+  account_utils.rs    # Account management
+  pda.rs              # PDA utilities
+  rent_cleaner.rs     # Rent reclamation
+  token_utils.rs      # SPL token operations
+  error.rs            # Error types
+  jupiter.rs          # Jupiter integration (feature)
+  prelude.rs          # Common imports
+
+examples/
+  rent_cleaner.rs
+  token_burn.rs
+  jupiter_swap.rs
+
+## Key Dependencies
+solana-sdk = "1.18"
+solana-client = "1.18"
+spl-token = "4.0"
+spl-associated-token-account = "2.3"
+tokio = { version = "1.36", features = ["full"] }
+
+## Features
+default = []
+anchor = ["anchor-lang", "anchor-spl"]
+jupiter = ["jupiter-client"]
+
+## Development
+Build: cargo check
+Test: cargo test
+Examples: cargo run --example [name]
+Publish: cargo publish
+
+## MCP Integration
+Use Solana MCP server for:
+- Testing operations before implementing
+- Debugging transactions
+- Monitoring wallets
+- Interactive development
+
+## Code Standards
+- No emojis in comments or variable names
+- Explicit error handling with Result<T>
+- Use ? operator for error propagation
+- Document public APIs
+- Provide runnable examples
+- Follow Rust 2021 conventions
+
+## Common Tasks
+
+Add new utility:
+1. Create module in src/
+2. Export in lib.rs
+3. Add to prelude if common
+4. Write example in examples/
+5. Update README
+
+Test new feature:
+1. Use MCP to test interactively
+2. Observe transaction structure
+3. Implement in Rust
+4. Add error handling
+5. Create example
+
+Debug issue:
+1. Get transaction signature
+2. Use MCP: "Decode transaction [SIG]"
+3. Identify failure point
+4. Fix in Rust code
+5. Test with MCP again
+
+## Repository
+https://github.com/piccassol/solana-pipkit
+
+## Author
+Noah Michel <noah@arktechnologies.ai>
+
+## Notes
+This crate is part of the ARK Technologies ecosystem.
+Used for production Solana operations in marketing automation platform.

@@ -45,12 +45,10 @@ use serde::{Deserialize, Serialize};
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_sdk::{
     commitment_config::CommitmentConfig,
-    pubkey::Pubkey,
     signature::{Keypair, Signature},
     signer::Signer,
     transaction::VersionedTransaction,
 };
-use std::str::FromStr;
 
 /// Default Jupiter API endpoint
 pub const JUPITER_API_URL: &str = "https://quote-api.jup.ag/v6";

@@ -9,7 +9,7 @@
 <h1 align="center">solana-pipkit</h1>
 
 <p align="center">
-  A pragmatic Rust toolkit for Solana program & client development
+  A pragmatic Rust toolkit for Solana program and client development
 </p>
 
 <p align="center">
@@ -49,6 +49,8 @@
 **solana-pipkit** is a Rust utility crate designed to streamline common tasks in **Solana program and client development**.
 It focuses on ergonomics, safety, and reusable patterns for production-grade Solana workflows.
 
+As of version **2.0.0**, solana-pipkit represents a stable, cohesive client-side framework for building trading systems, wallets, bots, analytics pipelines, and developer tooling on Solana.
+
 ---
 
 ## Installation
@@ -61,10 +63,10 @@ Or add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-solana-pipkit = "1.3.0"
+solana-pipkit = "2.0.0"
 
 # Enable high-performance trading features
-solana-pipkit = { version = "1.3.0", features = ["speed"] }
+solana-pipkit = { version = "2.0.0", features = ["speed"] }
 ```
 
 ---
@@ -78,19 +80,37 @@ solana-pipkit = { version = "1.3.0", features = ["speed"] }
   Simplified helpers for burning, transferring, and closing token accounts
 
 - **PDA Management**
-  Utilities for derivation, seeding, and validation (including Metaplex metadata PDAs)
+  Utilities for derivation, seeding, and validation including Metaplex metadata PDAs
 
 - **Account Utilities**
-  Common validation patterns and deserialization helpers
+  Common validation patterns, deserialization helpers, and account graph traversal
+
+- **Transaction Batching**
+  Fluent builders and batch executors for reliable multi-transaction workflows
 
 - **Anchor Reusables**
-  Macros and shared structures for cleaner, more maintainable Anchor programs
+  Shared structures and helpers for cleaner, more maintainable Anchor programs
 
 - **Safety Protocol**
-  Client-side validation to prevent costly transaction mistakes
+  Client-side validation to prevent costly transaction mistakes before submission
 
-- **Speed Module** *(v1.3.0 "Lightning")*
+- **Transaction Simulation**
+  Pre-flight simulation for previewing balance changes, compute usage, and failure risks
+
+- **Program and NFT Safety**
+  Detection of risky programs, upgrade authorities, and suspicious or fake NFTs
+
+- **MEV Protection**
+  Sandwich risk analysis, priority fee recommendations, and Jito bundle support
+
+- **Speed Module** (introduced in v1.3.0, consolidated in v2.0.0)
   High-performance execution for trading agents with connection pooling, blockhash caching, and optimized swaps
+
+- **Analytics Module** (v2.0.0)
+  Wallet profiling, PnL analysis, and behavioral classification
+
+- **DeFi Module** (v2.0.0)
+  Pool inspection, LP position tracking, and farming position analysis
 
 ---
 
@@ -104,26 +124,22 @@ use solana_sdk::signature::Keypair;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Multi-endpoint RPC with automatic failover
     let rpc = FastRpcClient::new(vec![
         "https://api.mainnet-beta.solana.com".into(),
         "https://solana-api.projectserum.com".into(),
     ]);
 
-    // Benchmark and use fastest endpoint
     rpc.set_strategy(LoadBalanceStrategy::LeastLatency);
     let health = rpc.benchmark_endpoints().await;
-    println!("Fastest: {} ({}ms)", health[0].url, health[0].latency_ms);
 
-    // Fast swap execution
     let payer = Keypair::new();
     let executor = SwapExecutor::new(rpc, payer);
 
     let result = executor.swap_fast(
         &mints::USDC,
         &mints::SOL,
-        1_000_000,  // 1 USDC
-        SwapConfig::fast(),  // High priority, direct routes
+        1_000_000,
+        SwapConfig::fast(),
     ).await?;
 
     println!("Swapped in {}ms", result.execution_time_ms);
@@ -138,80 +154,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ---
 
-## Safety Features
+## Transaction Simulation
 
-Crypto losses from typos and decimal errors are preventable. The safety module catches mistakes before they hit the chain.
+Before sending a transaction, solana-pipkit allows you to simulate execution locally or via RPC.
 
-```rust
-use solana_pipkit::prelude::*;
+Simulation provides insight into balance changes, compute unit usage, instruction failures, and swap outcomes without committing state on-chain.
 
-let protocol = SafetyProtocol::new()
-    .token_price(100.0)  // $100/SOL for USD calculations
-    .large_amount_threshold(1000.0);
-
-let report = protocol.validate_offline(
-    &sender,
-    &recipient,
-    amount_lamports,
-    9,  // SOL decimals
-    balance,
-);
-
-if !report.approved {
-    println!("Blocked: {:?}", report.blockers);
-    return Err("Transaction failed safety check");
-}
-
-if report.requires_confirmation {
-    println!("Warnings: {:?}", report.warnings);
-    // Prompt user to confirm
-}
-```
-
-**What it prevents:**
-- Address typos (invalid base58, wrong length)
-- Sending to yourself accidentally
-- Draining entire balance (>90% warning)
-- Decimal/magnitude errors (1000 vs 1.000)
-- Large transfers without confirmation (>$1000 USD)
-
-**Risk levels:** `Low` | `Medium` | `High` | `Critical`
-
-See [`examples/full_safety_demo.rs`](./examples/full_safety_demo.rs) for complete usage.
-
----
-
-## Quick Example
-
-Reclaiming rent from empty accounts:
-
-```rust
-use solana_pipkit::rent::RentCleaner;
-use solana_sdk::{signature::read_keypair_file, signer::Signer};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let keypair = read_keypair_file("~/.config/solana/id.json")?;
-    let rpc_url = "https://api.mainnet-beta.solana.com";
-
-    let cleaner = RentCleaner::new(rpc_url, keypair.pubkey(), keypair);
-
-    let reclaimed = cleaner.clean_empty_accounts().await?;
-    println!("Reclaimed {} lamports", reclaimed);
-
-    Ok(())
-}
-```
-
-More examples are available in the [examples/](./examples) directory.
+Simulation is a first-class component in version 2.0.0 and integrates directly with safety analysis to block or warn on unsafe outcomes.
 
 ---
 
 ## Project Status
 
-> **Early-stage utility crate** - APIs may evolve and breaking changes can occur as the toolkit matures.
+Stable major release. Version 2.0.0 marks a consolidated and production-ready API surface. Backwards compatibility will be preserved within the 2.x series.
 
-Fast chains deserve safe, expressive tooling. **solana-pipkit** exists to remove boilerplate, reduce footguns, and let you focus on protocol logic.
+Fast chains deserve safe, expressive tooling. solana-pipkit exists to reduce boilerplate, eliminate common footguns, and provide a reliable foundation for Solana client-side infrastructure.
 
 ---
 

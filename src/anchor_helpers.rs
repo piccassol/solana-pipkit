@@ -480,7 +480,7 @@ pub mod validation {
     pub fn validate_rent_exempt(account: &Account, rent: &solana_sdk::rent::Rent) -> Result<()> {
         if !rent.is_exempt(account.lamports, account.data.len()) {
             return Err(ToolkitError::InsufficientBalance {
-                needed: rent.minimum_balance(account.data.len()),
+                required: rent.minimum_balance(account.data.len()),
                 available: account.lamports,
             });
         }

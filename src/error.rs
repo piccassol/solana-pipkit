@@ -1,147 +1,122 @@
 //! Error types for solana-pipkit.
-//!
-//! This module provides a comprehensive error type for all toolkit operations.
 
-use spl_token::solana_program::program_error::ProgramError;
 use thiserror::Error;
 
-/// Main error type for solana-pipkit operations.
+pub type Result<T> = std::result::Result<T, ToolkitError>;
+
 #[derive(Error, Debug)]
 pub enum ToolkitError {
-    /// RPC client error from Solana.
     #[error("RPC error: {0}")]
-    RpcError(#[from] solana_client::client_error::ClientError),
+    RpcError(String),
 
-    /// Transaction execution or building error.
-    #[error("Transaction error: {0}")]
-    TransactionError(String),
-
-    /// Account not found on chain.
-    #[error("Account not found: {0}")]
-    AccountNotFound(String),
-
-    /// Invalid or unexpected account data.
-    #[error("Invalid account data: {0}")]
-    InvalidAccountData(String),
-
-    /// Failed to deserialize account data.
-    #[error("Deserialization error: {0}")]
-    Deserialization(String),
-
-    /// Insufficient lamports for operation.
-    #[error("Insufficient balance: need {needed}, have {available}")]
-    InsufficientBalance {
-        /// Lamports needed.
-        needed: u64,
-        /// Lamports available.
-        available: u64,
-    },
-
-    /// Invalid PDA derivation.
-    #[error("Invalid PDA: {0}")]
-    InvalidPda(String),
-
-    /// SPL Token program error.
-    #[error("Token error: {0}")]
-    TokenError(String),
-
-    /// Solana program error.
-    #[error("Program error: {0}")]
-    ProgramError(#[from] ProgramError),
-
-    /// Signature or signing error.
-    #[error("Signature error: {0}")]
-    SignatureError(#[from] solana_sdk::signature::SignerError),
-
-    /// Network or connection error.
-    #[error("Network error: {0}")]
-    NetworkError(String),
-
-    /// Failed to parse data.
     #[error("Parse error: {0}")]
     ParseError(String),
 
-    /// Jupiter DEX aggregator error.
-    #[error("Jupiter error: {0}")]
-    JupiterError(String),
+    #[error("Invalid input: {0}")]
+    InvalidInput(String),
 
-    /// Error during transaction signing.
-    #[error("Signing error: {0}")]
-    SigningError(String),
+    #[error("Account not found: {0}")]
+    AccountNotFound(String),
 
-    /// Batch operation error with details.
-    #[error("Batch error: {successful} succeeded, {failed} failed")]
-    BatchError {
-        /// Number of successful operations.
-        successful: usize,
-        /// Number of failed operations.
-        failed: usize,
-        /// Error messages from failures.
-        errors: Vec<String>,
-    },
+    #[error("Not found: {0}")]
+    NotFound(String),
 
-    /// Graph traversal error.
-    #[error("Graph error: {0}")]
-    GraphError(String),
+    #[error("Insufficient funds: {0}")]
+    InsufficientFunds(String),
 
-    /// Configuration error.
+    #[error("Transaction error: {0}")]
+    TransactionError(String),
+
+    #[error("Signature error: {0}")]
+    SignatureError(String),
+
+    #[error("Timeout: {0}")]
+    Timeout(String),
+
+    #[error("Unsupported operation: {0}")]
+    UnsupportedOperation(String),
+
+    #[error("Safety check failed: {0}")]
+    SafetyCheckFailed(String),
+
+    #[error("Rate limited: {0}")]
+    RateLimited(String),
+
+    #[error("Network error: {0}")]
+    NetworkError(String),
+
+    #[error("Serialization error: {0}")]
+    SerializationError(String),
+
     #[error("Configuration error: {0}")]
     ConfigError(String),
 
-    /// Operation timeout.
-    #[error("Operation timed out: {0}")]
-    Timeout(String),
+    #[error("Unknown error: {0}")]
+    Unknown(String),
 
-    /// Custom error with message.
     #[error("Custom error: {0}")]
     Custom(String),
 
-    /// Invalid address format or validation failure.
-    #[error("Invalid address '{address}': {reason}")]
-    InvalidAddress {
-        /// The invalid address string.
-        address: String,
-        /// Reason for validation failure.
-        reason: String,
-    },
+    #[error("Jupiter error: {0}")]
+    JupiterError(String),
 
-    /// Amount validation error.
-    #[error("Amount validation error: {message}")]
-    AmountValidation {
-        /// Error message.
-        message: String,
-    },
+    #[error("Invalid account data: {0}")]
+    InvalidAccountData(String),
+
+    #[error("Signing error: {0}")]
+    SigningError(String),
+
+    #[error("Token error: {0}")]
+    TokenError(String),
+
+    #[error("Amount validation failed: {reason}")]
+    AmountValidation { reason: String },
+
+    #[error("Invalid address '{address}': {reason}")]
+    InvalidAddress { address: String, reason: String },
+
+    #[error("Insufficient balance: required {required}, available {available}")]
+    InsufficientBalance { required: u64, available: u64 },
 }
 
 impl ToolkitError {
-    /// Create a transaction error from a string.
-    pub fn transaction<S: Into<String>>(msg: S) -> Self {
-        Self::TransactionError(msg.into())
-    }
-
-    /// Create an account not found error.
-    pub fn account_not_found<S: Into<String>>(pubkey: S) -> Self {
-        Self::AccountNotFound(pubkey.into())
-    }
-
-    /// Create an invalid account data error.
-    pub fn invalid_data<S: Into<String>>(msg: S) -> Self {
-        Self::InvalidAccountData(msg.into())
-    }
-
-    /// Create a custom error.
     pub fn custom<S: Into<String>>(msg: S) -> Self {
-        Self::Custom(msg.into())
-    }
-
-    /// Check if this is a retryable error (network issues, etc.).
-    pub fn is_retryable(&self) -> bool {
-        matches!(
-            self,
-            Self::RpcError(_) | Self::NetworkError(_) | Self::Timeout(_)
-        )
+        ToolkitError::Custom(msg.into())
     }
 }
 
-/// Result type alias for toolkit operations.
-pub type Result<T> = std::result::Result<T, ToolkitError>;
+impl From<std::io::Error> for ToolkitError {
+    fn from(err: std::io::Error) -> Self {
+        ToolkitError::Unknown(err.to_string())
+    }
+}
+
+impl From<solana_sdk::pubkey::ParsePubkeyError> for ToolkitError {
+    fn from(err: solana_sdk::pubkey::ParsePubkeyError) -> Self {
+        ToolkitError::ParseError(err.to_string())
+    }
+}
+
+impl From<solana_client::client_error::ClientError> for ToolkitError {
+    fn from(err: solana_client::client_error::ClientError) -> Self {
+        ToolkitError::RpcError(err.to_string())
+    }
+}
+
+impl From<bs58::decode::Error> for ToolkitError {
+    fn from(err: bs58::decode::Error) -> Self {
+        ToolkitError::ParseError(err.to_string())
+    }
+}
+
+impl From<solana_sdk::program_error::ProgramError> for ToolkitError {
+    fn from(err: solana_sdk::program_error::ProgramError) -> Self {
+        ToolkitError::TokenError(err.to_string())
+    }
+}
+
+impl From<bincode::Error> for ToolkitError {
+    fn from(err: bincode::Error) -> Self {
+        ToolkitError::SerializationError(err.to_string())
+    }
+}

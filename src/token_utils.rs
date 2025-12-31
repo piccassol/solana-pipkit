@@ -56,6 +56,7 @@ impl TokenClient {
     }
 
     /// Burn tokens and close the account if empty.
+    #[allow(clippy::vec_init_then_push)]
     pub async fn burn_and_close(
         &self,
         mint: &Pubkey,

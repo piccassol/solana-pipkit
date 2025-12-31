@@ -7,9 +7,11 @@
 use solana_pipkit::prelude::*;
 use solana_sdk::pubkey::Pubkey;
 use std::str::FromStr;
+use solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 fn main() {
     println!("=== Solana Safety Protocol Demo ===\n");
+    
 
     // Test addresses
     let sender = Pubkey::from_str("7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU").unwrap();
@@ -122,7 +124,7 @@ fn main() {
     println!("\n=== Demo Complete ===");
 }
 
-fn print_report(report: &SafetyReport) {
+fn print_report(report: &solana_pipkit::safety::validator::SafetyReport) {
     println!("  Status: {}", if report.approved { "APPROVED" } else { "BLOCKED" });
     println!("  Risk Level: {}", report.risk_level);
     println!("  From: {} -> To: {}", report.from_display, report.to_display);

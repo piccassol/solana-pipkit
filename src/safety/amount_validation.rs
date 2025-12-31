@@ -135,13 +135,13 @@ impl AmountValidator {
     pub fn human_to_token_amount(human_amount: f64, decimals: u8) -> Result<u64> {
         if human_amount < 0.0 {
             return Err(ToolkitError::AmountValidation {
-                message: "Amount cannot be negative".to_string(),
+                reason: "Amount cannot be negative".to_string(),
             });
         }
 
         if human_amount.is_nan() || human_amount.is_infinite() {
             return Err(ToolkitError::AmountValidation {
-                message: "Amount must be a valid number".to_string(),
+                reason: "Amount must be a valid number".to_string(),
             });
         }
 
@@ -151,7 +151,7 @@ impl AmountValidator {
         // Check for overflow
         if token_amount > u64::MAX as f64 {
             return Err(ToolkitError::AmountValidation {
-                message: "Amount too large, would overflow".to_string(),
+                reason: "Amount too large, would overflow".to_string(),
             });
         }
 

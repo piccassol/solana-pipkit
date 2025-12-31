@@ -437,6 +437,7 @@ impl ParallelBatchExecutor {
         };
 
         for (idx, result) in results {
+            let idx: usize = idx;
             match result {
                 Ok(sig) => {
                     batch_result.successful.push(sig);

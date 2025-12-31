@@ -1,6 +1,6 @@
 //! Example: Burn tokens and close the account.
 
-use solana_rust_toolkit::token_utils::TokenClient;
+use solana_pipkit::token_utils::TokenClient;
 use solana_sdk::{pubkey::Pubkey, signature::Keypair};
 use std::{env, str::FromStr};
 

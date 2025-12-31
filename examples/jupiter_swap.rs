@@ -63,13 +63,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     println!("1 USDC = {} SOL", sol_output as f64 / LAMPORTS_PER_SOL as f64);
 
-    // Example 3: Get route labels
-    println!("\n=== Route Discovery ===");
-    let labels = jupiter
-        .get_route_labels(JupiterClient::SOL_MINT, JupiterClient::USDC_MINT, sol_amount)
-        .await?;
-    
-    println!("DEXs used: {}", labels.join(" → "));
+        // Example 3: Get route labels
+        println!("\n=== Route Discovery ===");
+        let labels: Vec<String> = jupiter
+            .swap_route(from_token, to_token, amount)
+            .await?
+            .into_iter()
+            .map(|route| route.dex_name)
+            .collect();
+        
+        println!("DEXs used: {}", labels.join(" → "));    
 
     // Example 4: Execute a swap (commented out for safety)
     // Uncomment to actually execute a swap

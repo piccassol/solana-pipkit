@@ -856,11 +856,11 @@ impl ComprehensiveSafetyAnalyzer {
 
         if !sim_result.safe {
             for blocker in &sim_result.blockers {
-                report.add_blocker(blocker.clone());
+                report.add_blocker(blocker.to_string());
             }
         }
         for warning in &sim_result.warnings {
-            report.add_warning(warning.clone(), RiskLevel::Medium);
+            report.add_warning(warning.to_string(), RiskLevel::Medium);
         }
         report.simulation = Some(sim_result);
 
@@ -890,7 +890,7 @@ impl ComprehensiveSafetyAnalyzer {
             }
 
             for warning in &program_report.warnings {
-                report.add_warning(warning.description(), RiskLevel::Medium);
+                report.add_warning(format!("{:?}", warning), RiskLevel::Medium);
             }
 
             report.program_reports.push(program_report);
@@ -941,7 +941,7 @@ impl ComprehensiveSafetyAnalyzer {
         }
 
         for warning in &nft_report.warnings {
-            report.add_warning(warning.clone(), RiskLevel::Medium);
+            report.add_warning(warning.to_string(), RiskLevel::Medium);
         }
 
         report.nft_report = Some(nft_report);
