@@ -1,7 +1,7 @@
 //! Example: Clean empty token accounts and recover SOL.
 
-use solana_pipkit::rent_cleaner::{RentCleaner, RentCleanerConfig};
-use solana_sdk::signature::Keypair;
+use solana_pipkit::rent_cleaner::{RentCleaner, RentCleanerConfig, CleanableAccount};
+use solana_sdk::signature::{Keypair, Signer};
 use std::env;
 
 #[tokio::main]
@@ -28,7 +28,7 @@ async fn main() -> anyhow::Result<()> {
 
     // Find empty accounts
     println!("\nScanning for empty token accounts...");
-    let accounts: Vec<Pubkey> = cleaner.find_empty_token_accounts().await?;
+    let accounts: Vec<CleanableAccount> = cleaner.find_empty_token_accounts().await?;
 
     if accounts.is_empty() {
         println!("No empty token accounts found.");

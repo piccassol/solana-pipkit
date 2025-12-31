@@ -1,7 +1,7 @@
 //! Example: Burn tokens and close the account.
 
 use solana_pipkit::token_utils::TokenClient;
-use solana_sdk::{pubkey::Pubkey, signature::Keypair};
+use solana_sdk::{pubkey::Pubkey, signature::{Keypair, Signer}};
 use std::{env, str::FromStr};
 
 #[tokio::main]

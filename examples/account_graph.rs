@@ -4,12 +4,13 @@
 //! for analyzing wallet holdings and finding closeable accounts.
 
 use solana_pipkit::prelude::*;
+use solana_pipkit::account_graph::{AccountGraph, AccountNode, AccountNodeType, AccountEdge, EdgeType};
 use solana_sdk::pubkey::Pubkey;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     // Use mainnet for real data
-    let rpc_url = "https://api.mainnet-beta.solana.com";
+    let _rpc_url = "https://api.mainnet-beta.solana.com";
 
     // Example wallet with token accounts (use a real wallet for testing)
     // This is a placeholder - replace with actual wallet for real testing

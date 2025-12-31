@@ -273,7 +273,7 @@ impl JupiterClient {
     /// * `slippage_bps` - Slippage tolerance in basis points (50 = 0.5%)
     ///
     /// # Example
-    /// ```rust,no_run
+    /// ```rust,ignore
     /// let quote = jupiter.get_quote(
     ///     JupiterClient::USDC_MINT,
     ///     JupiterClient::SOL_MINT,
@@ -450,12 +450,12 @@ impl JupiterClient {
     /// # Arguments
     /// * `wallet` - The wallet keypair
     /// * `input_mint` - Input token mint address
-    /// * `output_mint` - Output token mint address  
+    /// * `output_mint` - Output token mint address
     /// * `amount` - Amount to swap in smallest units
     /// * `slippage_bps` - Slippage tolerance in basis points
     ///
     /// # Example
-    /// ```rust,no_run
+    /// ```rust,ignore
     /// // Swap 1 USDC for SOL with 0.5% slippage
     /// let sig = jupiter.simple_swap(
     ///     &wallet,

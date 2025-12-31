@@ -2,10 +2,12 @@
 //!
 //! Run with: cargo run --example wallet_profile --features analytics
 
+#[cfg(feature = "analytics")]
 use solana_client::rpc_client::RpcClient;
+#[cfg(feature = "analytics")]
 use solana_sdk::pubkey::Pubkey;
+#[cfg(feature = "analytics")]
 use std::str::FromStr;
-
 #[cfg(feature = "analytics")]
 use solana_pipkit::analytics::{Analytics, AnalyticsConfig, WalletClassification};
 

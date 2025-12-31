@@ -2,10 +2,12 @@
 //!
 //! Run with: cargo run --example pool_info --features defi
 
+#[cfg(feature = "defi")]
 use solana_client::rpc_client::RpcClient;
+#[cfg(feature = "defi")]
 use solana_sdk::pubkey::Pubkey;
+#[cfg(feature = "defi")]
 use std::str::FromStr;
-
 #[cfg(feature = "defi")]
 use solana_pipkit::defi::{DeFi, DeFiConfig, calculate_constant_product_swap};
 

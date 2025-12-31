@@ -5,7 +5,7 @@
 //!
 //! Run with: cargo run --example address_verification
 
-use solana_pipkit::safety::{AddressVerifier, AddressComparison};
+use solana_pipkit::safety::AddressVerifier;
 
 fn main() {
     println!("=== Solana Address Verification Demo ===\n");

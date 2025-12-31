@@ -4,6 +4,7 @@
 //! to efficiently execute multiple transactions.
 
 use solana_pipkit::prelude::*;
+use solana_pipkit::transaction::{TransactionBuilder, TransactionConfig, BatchExecutor, BatchResult};
 use solana_sdk::{
     pubkey::Pubkey,
     signature::Keypair,

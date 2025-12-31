@@ -5,7 +5,7 @@
 //!
 //! Run with: cargo run --example jupiter_swap --features jupiter
 
-use solana_pipkit::jupiter::{JupiterClient, SwapConfig};
+use solana_pipkit::jupiter::JupiterClient;
 use solana_sdk::{
     native_token::LAMPORTS_PER_SOL,
     signature::{read_keypair_file, Keypair},
@@ -65,12 +65,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Example 3: Get route labels
         println!("\n=== Route Discovery ===");
+        let from_token = JupiterClient::SOL_MINT;
+        let to_token = JupiterClient::USDC_MINT;
+        let amount = LAMPORTS_PER_SOL / 10;
         let labels: Vec<String> = jupiter
-            .swap_route(from_token, to_token, amount)
-            .await?
-            .into_iter()
-            .map(|route| route.dex_name)
-            .collect();
+            .get_route_labels(from_token, to_token, amount)
+            .await?;
         
         println!("DEXs used: {}", labels.join(" → "));    
 
