@@ -287,11 +287,6 @@ This project is licensed under the MIT License.
 
 ---
 
-<p align="center">
-  <strong>Ark Technologies AI</strong><br/>
-  Engineering high-performance infrastructure and developer tooling<br/>
-  for next-generation decentralized systems.
-</p>
 
 <p align="center">
   Built by <strong>Noah Michél</strong><br/>
