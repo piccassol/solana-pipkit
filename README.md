@@ -295,11 +295,10 @@ This project is licensed under the MIT License.
 
 <p align="center">
   Built by <strong>Noah Michél</strong><br/>
-  © Ark Technologies AI
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Built%20by-ARK%20Technologies-00FFA3.svg" />
+
   <img src="https://img.shields.io/badge/Rust-%F0%9F%A6%80-000000.svg?logo=rust" />
   <img src="https://img.shields.io/badge/Solana-%E2%9A%A1-00FFA3.svg?logo=solana" />
 </p>
