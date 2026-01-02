@@ -49,7 +49,7 @@
 **solana-pipkit** is a Rust utility crate designed to streamline common tasks in **Solana program and client development**.
 It focuses on ergonomics, safety, and reusable patterns for production-grade Solana workflows.
 
-As of version **2.1.0**, solana-pipkit represents a stable, cohesive client-side framework for building trading systems, wallets, bots, analytics pipelines, and developer tooling on Solana.
+As of version **2.2.0**, solana-pipkit represents a stable, cohesive client-side framework for building trading systems, wallets, bots, analytics pipelines, and developer tooling on Solana.
 
 ---
 
@@ -63,10 +63,10 @@ Or add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-solana-pipkit = "2.1.0"
+solana-pipkit = "2.2.0"
 
 # Enable high-performance trading features
-solana-pipkit = { version = "2.1.0", features = ["speed"] }
+solana-pipkit = { version = "2.2.0", features = ["speed"] }
 ```
 
 ---
@@ -110,10 +110,63 @@ solana-pipkit = { version = "2.1.0", features = ["speed"] }
   Wallet profiling, PnL analysis, and behavioral classification
 
 - **DeFi Module** (v2.0.0)
-   Pool inspection, LP position tracking, and farming position analysis
+  Pool inspection, LP position tracking, and farming position analysis
 
 - **Multi-Agent Module** (v2.1.0)
-   Secure agent coordination, encrypted messaging, task marketplace, and event streaming
+  Secure agent coordination, encrypted messaging, task marketplace, and event streaming
+  
+ - **Agent-Registry Module** (v2.2.0)
+   Adds a PDA-based, on-chain identity and discovery layer for autonomous agents on Solana, enabling capability-indexed registration, safe metadata storage, real-time event monitoring, and peer discovery for multi-agent coordination.
+
+## Agent-Registry Module
+
+The agent-registry module provides on-chain agent registration, discovery, and coordination primitives. It features PDA-derived agent accounts, capability-based searching, real-time event monitoring, and peer discovery for multi-agent task routing.
+
+```rust
+use solana_pipkit::agent_registry::*;
+use solana_sdk::signature::Keypair;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = AgentRegistryClient::new("https://api.devnet.solana.com".to_string());
+    let agent = Keypair::new();
+
+    // Register agent with capabilities
+    let params = RegistrationParams::new(
+        agent.pubkey(),
+        vec!["inference".to_string(), "model_finetuning".to_string()],
+        "1.0.0"
+    );
+
+    let signature = client.register_agent(&params, &agent).await?;
+    println!("Agent registered: {}", signature);
+
+    // Discover peers for collaborative tasks
+    let peers = client.discover_peers(
+        vec!["inference".to_string()],
+        5000, // min reputation
+        5,
+    ).await?;
+
+    if let Some(inference_agents) = peers.get("inference") {
+        println!("Found {} inference agents:", inference_agents.len());
+        for peer in inference_agents {
+            println!("  - {} (reputation: {})", peer.pubkey, peer.reputation);
+        }
+    }
+
+    Ok(())
+}
+```
+
+**Agent-Registry Features:**
+- **Agent Registration** - On-chain identity with capabilities, version, and metadata
+- **Capability Discovery** - Search for agents by specific capabilities
+- **Peer Discovery** - Find collaborators for multi-agent task coordination
+- **Event Monitoring** - Real-time subscription to registry changes
+- **Safety Checks** - Metadata size limits, rent-exemption validation
+
+---
 
 ## Analytics Module
 
@@ -261,11 +314,10 @@ Simulation is a first-class component in version 2.0.0 and integrates directly w
 
 ---
 
-## Project Status
+ ## Project Status
 
-Stable major release. Version 2.1.0 adds multi-agent coordination primitives with encrypted messaging and task marketplace capabilities. Backwards compatibility will be preserved within the 2.x series.
-
-Fast chains deserve safe, expressive tooling. solana-pipkit exists to reduce boilerplate, eliminate common footguns, and provide a reliable foundation for Solana client-side infrastructure.
+ Stable major release. Version 2.2.0 adds the agent-registry module for on-chain agent identity and discovery. Backwards compatibility will be preserved within the 2.x series.
+ Fast chains deserve safe, expressive tooling. solana-pipkit exists to reduce boilerplate, eliminate common footguns, and provide a reliable foundation for Solana client-side infrastructure.
 
 ---
 
