@@ -10,6 +10,7 @@
 //! - **Analytics**: Wallet profiling, holder analysis, pattern detection, PnL tracking
 //! - **DeFi**: Pool interactions, liquidity provision, yield farming, LP token parsing
 //! - **Multi-Agent**: Agent coordination, messaging, encryption, task marketplace
+//! - **Agent Registry**: On-chain agent registration, discovery, and peer coordination
 //! - **Agent Analytics**: Agent classification, interaction graphs, risk scoring
 //!
 //! ## Feature Flags
@@ -22,6 +23,7 @@
 //! - `safety` - Transaction safety validation
 //! - `speed` - Performance optimizations
 //! - `multi-agent` - Multi-agent coordination primitives
+//! - `agent-registry` - On-chain agent registration and discovery
 //! - `agent-analytics` - Agent-specific analytics and profiling
 //! - `all` - Enable all features
 
@@ -56,6 +58,9 @@ pub mod defi;
 #[cfg(feature = "multi-agent")]
 pub mod multi_agent;
 
+#[cfg(feature = "agent-registry")]
+pub mod agent_registry;
+
 #[cfg(feature = "agent-analytics")]
 pub mod agent_analytics;
 
@@ -86,6 +91,9 @@ pub mod prelude {
 
     #[cfg(feature = "multi-agent")]
     pub use crate::multi_agent::*;
+
+    #[cfg(feature = "agent-registry")]
+    pub use crate::agent_registry::*;
 
     #[cfg(feature = "agent-analytics")]
     pub use crate::agent_analytics::*;

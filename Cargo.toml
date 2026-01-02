@@ -29,6 +29,10 @@ path = "examples/wallet_profile.rs"
 name = "pool_info"
 path = "examples/pool_info.rs"
 
+[[example]]
+name = "agent_registry"
+path = "examples/agent_registry.rs"
+
 [dependencies]
 solana-sdk = "1.18"
 solana-client = "1.18"
@@ -79,5 +83,6 @@ defi = []
 safety = []
 speed = ["jito"]
 multi-agent = ["aes-gcm", "tokio-tungstenite", "futures-util", "rand"]
+agent-registry = []
 agent-analytics = []
-all = ["anchor", "jupiter", "jito", "analytics", "defi", "safety", "speed", "multi-agent", "agent-analytics"]
+all = ["anchor", "jupiter", "jito", "analytics", "defi", "safety", "speed", "multi-agent", "agent-registry", "agent-analytics"]
